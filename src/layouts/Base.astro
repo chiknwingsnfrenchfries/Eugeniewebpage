@@ -48,7 +48,7 @@ const ogLocale = lang === 'fr' ? 'fr_CA' : 'en_CA'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <Tracking />
+    <Tracking lang={lang} />
     <title>{title}</title>
     <meta name="description" content={description} />
     {route.noindex && <meta name="robots" content="noindex, follow" />}

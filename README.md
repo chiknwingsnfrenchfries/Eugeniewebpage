@@ -40,13 +40,19 @@ public/                  images, robots.txt, .nojekyll
 The sitemap and the language alternates pick it up automatically. Pages marked `noindex`
 are left out of the sitemap.
 
-## Tracking
+## Tracking and consent
 
-`src/components/Tracking.astro` sets Google Consent Mode defaults, then loads RudderStack and
-Google Tag Manager. **There is no consent banner on this site yet** (CookieYes is licensed for
-the quiz subdomain only; GetTerms is planned). Until one is added, analytics is allowed and
-ad/marketing storage is denied. The comments at the top of that file explain how to plug in the
-new banner and list the bugs that must not come back.
+`src/components/Tracking.astro` loads, in order:
+
+1. **GetTerms** consent banner (must be the first script). It sets Google Consent Mode defaults
+   per region and shares consent with quiz.eugeniedo.com.
+2. **RudderStack.** Every page view is sent for every visitor ("pre-consent" mode, session-only
+   ID). When a visitor accepts Analytics, RudderStack switches to persistent cookies so their
+   visits can be linked over time.
+3. **Google Tag Manager.** GA4 and Google Ads tags inside it follow Consent Mode.
+
+The footer has a "Cookie preferences" link that reopens the banner. Comments at the top of
+`Tracking.astro` list the bugs that must not come back.
 
 ## History
 

@@ -1,43 +1,42 @@
 ---
-// Analytics and tag manager. Order matters:
-// 1. Consent defaults (Google Consent Mode) — must come before GTM
-// 2. RudderStack, with consent read from the consent banner's cookie
-// 3. Google Tag Manager
+// Consent banner, analytics and tag manager. Order matters:
+// 1. GetTerms CMP — must be the first <script> on the page. It sets Google
+//    Consent Mode defaults per region, shows the banner, and blocks known
+//    third-party scripts until their category is accepted (auto=true).
+// 2. RudderStack
+// 3. Google Tag Manager — GA4 / Google Ads tags inside it follow Consent Mode
+//    ("advanced" mode: cookieless pings until analytics/ads consent).
 //
-// NO CONSENT BANNER YET. CookieYes is licensed for quiz.eugeniedo.com only, and
-// the plan is to move to GetTerms. Until a banner is installed here, nobody can
-// change the defaults below, so:
-// - analytics + functional: allowed (RudderStack events, GA-style measurement)
-// - marketing/ads + performance: denied. Google Ads tags in GTM run in Consent
-//   Mode "cookieless" mode: conversions are still pinged and modelled, but no ad
-//   cookies are set. Our own gclid capture (stored with the lead) is unaffected.
-// When the new banner is added: load its script FIRST (above everything here),
-// have it update Google Consent Mode, and point cmpValue() at its cookie.
+// RudderStack policy (decided 2026-11-15):
+// - Every page view is sent to RudderStack for every visitor, whatever they
+//   choose in the banner ("pre-consent" mode, events delivered immediately).
+// - Without analytics consent, RudderStack keeps only a session ID: journeys
+//   are visible within one visit, not stitched across visits.
+// - Once the visitor accepts Analytics in GetTerms, rudderanalytics.consent()
+//   switches RudderStack to its normal persistent cookies.
+// - Per-destination consent (e.g. marketing destinations) is set in the
+//   RudderStack dashboard using the IDs: necessary, functional, analytics, marketing.
 //
 // Bugs from the quiz build that must not come back:
 // - load() is called from the SDK tag's onload, never from a separate block
 //   below an async tag.
-// - With no consent cookie yet, analytics + functional default to allowed and
-//   marketing + performance to denied. Testing === 'yes' alone blocks every new visitor.
-// - RudderStack v3 takes consent as allowedConsentIds / deniedConsentIds.
-//   (The quiz passes a getConsent() function, which the SDK ignores.)
+// - RudderStack v3 takes consent as allowedConsentIds / deniedConsentIds via
+//   consent(); a getConsent() load option does not exist and is ignored.
+const { lang } = Astro.props
+const GETTERMS = `https://gettermscmp.com/cookie-consent`
+const GETTERMS_ID = '95e3a714-5733-4d51-b299-82bd065f4a7e'
+const gtLang = lang === 'en' ? 'en' : 'fr'
 const GTM_ID = 'GTM-T74GLFPF'
 ---
+<!-- GetTerms CMP -->
+<link rel="preload" href={`${GETTERMS}/blocker/${GETTERMS_ID}/${gtLang}?auto=true`} as="script" />
+<script is:inline type="text/javascript" src={`${GETTERMS}/blocker/${GETTERMS_ID}/${gtLang}?auto=true`}></script>
+<script is:inline async type="text/javascript" src={`${GETTERMS}/widget/${GETTERMS_ID}/${gtLang}?auto=true`}></script>
+<!-- End GetTerms CMP -->
+
 <script is:inline>
-  window.dataLayer = window.dataLayer || []
-  function gtag() { window.dataLayer.push(arguments) }
-  gtag('consent', 'default', {
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    analytics_storage: 'granted',
-    functionality_storage: 'granted',
-    personalization_storage: 'denied',
-    security_storage: 'granted',
-  })
-</script>
-<script is:inline>
-  // Calls made before the SDK loads are queued here and replayed in initRudderStack().
+  // window.rs('track', ...) is safe to call at any time: calls made before the
+  // SDK has loaded are queued and replayed in initRudderStack().
   window.rsQueue = window.rsQueue || []
   window.rs = function () {
     var args = Array.prototype.slice.call(arguments)
@@ -48,44 +47,61 @@ const GTM_ID = 'GTM-T74GLFPF'
       window.rsQueue.push(args)
     }
   }
-  // Reads a category from the consent banner's cookie. Currently the CookieYes
-  // format, which is never present on this domain (see note at the top), so the
-  // defaults apply. Replace when the GetTerms banner is installed.
-  function cmpValue(category) {
-    try {
-      var m = document.cookie.match(/(?:^|;\s*)cookieyes-consent=([^;]+)/)
-      if (!m) return null
-      var pair = decodeURIComponent(m[1]).match(new RegExp('(?:^|,)' + category + ':([^,]+)'))
-      return pair ? pair[1] : null
-    } catch (e) { return null }
-  }
-  window.consentState = function () {
-    var a = cmpValue('analytics'), f = cmpValue('functional')
-    return {
-      necessary: true,
-      analytics: a === null ? true : a === 'yes',
-      functional: f === null ? true : f === 'yes',
-      marketing: cmpValue('advertisement') === 'yes' || cmpValue('marketing') === 'yes',
-      performance: cmpValue('performance') === 'yes',
+
+  // Latest GetTerms consent, normalised to lowercase category names:
+  // { decided: bool, functional, analytics, marketing, unclassified: bool }
+  // Before GetTerms reports anything: undecided, nothing granted.
+  window.siteConsent = { decided: false, functional: false, analytics: false, marketing: false, unclassified: false }
+  function readGetTerms(detail) {
+    if (!detail || !detail.preferences) return
+    var p = {}
+    for (var k in detail.preferences) p[k.toLowerCase()] = detail.preferences[k] === true
+    window.siteConsent = {
+      decided: detail.decided === true,
+      functional: !!p.functional,
+      analytics: !!p.analytics,
+      marketing: !!p.marketing,
+      unclassified: !!p.unclassified,
     }
   }
-  function rsConsentOptions() {
-    var c = window.consentState(), allowed = [], denied = []
-    for (var k in c) (c[k] ? allowed : denied).push(k)
-    return { consentManagement: { enabled: true, provider: 'custom', allowedConsentIds: allowed, deniedConsentIds: denied } }
+
+  // Hand the visitor's decision to RudderStack. Only when they have actually
+  // decided AND accepted Analytics: otherwise RudderStack stays in pre-consent
+  // mode (page views still sent, session-only ID, no persistent cookie).
+  var rsConsentApplied = false
+  function applyRsConsent() {
+    var c = window.siteConsent
+    if (!window.rsReady || rsConsentApplied || !c.decided || !c.analytics) return
+    var allowed = ['necessary'], denied = []
+    ;['functional', 'analytics', 'marketing'].forEach(function (k) { (c[k] ? allowed : denied).push(k) })
+    window.rudderanalytics.consent({
+      consentManagement: { allowedConsentIds: allowed, deniedConsentIds: denied },
+      trackConsent: true, // records the decision as a "Consent Management Interaction" event
+    })
+    rsConsentApplied = true
   }
+
+  window.addEventListener('getterms:consent', function (e) {
+    readGetTerms(e.detail)
+    applyRsConsent()
+  })
+
   function initRudderStack() {
-    var opts = rsConsentOptions()
-    opts.storage = { type: 'cookieStorage' }
-    window.rudderanalytics.load('3E2uEolQpd6x1LeTk22VNJK2Otv', 'https://eugeniedosbtny.dataplane.rudderstack.com', opts)
+    if (window.GetTermsCMP && window.GetTermsCMP.consent) readGetTerms(window.GetTermsCMP.consent)
+    window.rudderanalytics.load('3E2uEolQpd6x1LeTk22VNJK2Otv', 'https://eugeniedosbtny.dataplane.rudderstack.com', {
+      consentManagement: { enabled: true, provider: 'custom' },
+      preConsent: {
+        enabled: true,
+        storage: { strategy: 'session' },
+        events: { delivery: 'immediate' },
+      },
+      storage: { type: 'cookieStorage' },
+    })
     window.rsReady = true
+    applyRsConsent()
     window.rs('page')
     var q = window.rsQueue.splice(0)
     for (var i = 0; i < q.length; i++) window.rs.apply(null, q[i])
-    // CookieYes event name; update together with cmpValue() for the new banner
-    document.addEventListener('cookieyes_consent_update', function () {
-      window.rudderanalytics.consent(rsConsentOptions())
-    })
   }
   window.rudderanalytics = window.rudderanalytics || []
 </script>
