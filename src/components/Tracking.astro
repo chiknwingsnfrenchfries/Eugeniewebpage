@@ -1,0 +1,77 @@
+---
+// Consent banner, analytics and tag manager, in the order they must load:
+// 1. CookieYes (reads/asks consent; also sets Google Consent Mode defaults if
+//    enabled in the CookieYes dashboard, so it must come before GTM)
+// 2. RudderStack, with consent read from the CookieYes cookie
+// 3. Google Tag Manager
+//
+// Bugs from the quiz build that must not come back:
+// - load() is called from the SDK tag's onload, never from a separate block
+//   below an async tag.
+// - With no CookieYes cookie yet, analytics + functional default to allowed and
+//   marketing + performance to denied. Testing === 'yes' alone blocks every new visitor.
+// - RudderStack v3 takes consent as allowedConsentIds / deniedConsentIds.
+//   (The quiz passes a getConsent() function, which the SDK ignores.)
+// - CookieYes names the ad category "advertisement" in its cookie and fires
+//   "cookieyes_consent_update" (underscores). Both are handled here.
+const COOKIEYES_ID = '95bca4ef9c5872f825a945271ec0d765'
+// RudderStack write key and data plane URL are in initRudderStack() below:
+// that script must stay global (no define:vars), so they are written inline.
+const GTM_ID = 'GTM-T74GLFPF'
+---
+<script id="cookieyes" is:inline src={`https://cdn-cookieyes.com/client_data/${COOKIEYES_ID}/script.js`}></script>
+
+<script is:inline>
+  // Calls made before the SDK loads are queued here and replayed in initRudderStack().
+  window.rsQueue = window.rsQueue || []
+  window.rs = function () {
+    var args = Array.prototype.slice.call(arguments)
+    var ra = window.rudderanalytics
+    if (window.rsReady && ra && typeof ra[args[0]] === 'function') {
+      try { ra[args[0]].apply(ra, args.slice(1)) } catch (e) { console.warn('[RudderStack]', e) }
+    } else {
+      window.rsQueue.push(args)
+    }
+  }
+  function cookieYesValue(category) {
+    try {
+      var m = document.cookie.match(/(?:^|;\s*)cookieyes-consent=([^;]+)/)
+      if (!m) return null
+      var pair = decodeURIComponent(m[1]).match(new RegExp('(?:^|,)' + category + ':([^,]+)'))
+      return pair ? pair[1] : null
+    } catch (e) { return null }
+  }
+  window.consentState = function () {
+    var a = cookieYesValue('analytics'), f = cookieYesValue('functional')
+    return {
+      necessary: true,
+      analytics: a === null ? true : a === 'yes',
+      functional: f === null ? true : f === 'yes',
+      marketing: cookieYesValue('advertisement') === 'yes' || cookieYesValue('marketing') === 'yes',
+      performance: cookieYesValue('performance') === 'yes',
+    }
+  }
+  function rsConsentOptions() {
+    var c = window.consentState(), allowed = [], denied = []
+    for (var k in c) (c[k] ? allowed : denied).push(k)
+    return { consentManagement: { enabled: true, provider: 'custom', allowedConsentIds: allowed, deniedConsentIds: denied } }
+  }
+  function initRudderStack() {
+    var opts = rsConsentOptions()
+    opts.storage = { type: 'cookieStorage' }
+    window.rudderanalytics.load('3E2uEolQpd6x1LeTk22VNJK2Otv', 'https://eugeniedosbtny.dataplane.rudderstack.com', opts)
+    window.rsReady = true
+    window.rs('page')
+    var q = window.rsQueue.splice(0)
+    for (var i = 0; i < q.length; i++) window.rs.apply(null, q[i])
+    document.addEventListener('cookieyes_consent_update', function () {
+      window.rudderanalytics.consent(rsConsentOptions())
+    })
+  }
+  window.rudderanalytics = window.rudderanalytics || []
+</script>
+<script is:inline async src="https://cdn.rudderlabs.com/v3/modern/rsa.min.js" onload="initRudderStack()"></script>
+
+<script is:inline define:vars={{ GTM_ID }}>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer',GTM_ID)
+</script>

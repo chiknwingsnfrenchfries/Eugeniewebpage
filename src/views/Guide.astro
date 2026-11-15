@@ -1,0 +1,30 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+import { href } from '../lib/routes.js'
+
+// Placeholder page shared by the four guides (guide-island, guide-north, guide-south, guide-buyer)
+const { lang, guideKey } = Astro.props
+const t = useLang(lang)
+const tx = translations.guidePage
+const guide = tx.guides[guideKey]
+---
+<section class="guide-section">
+  <div class="container">
+    <a class="guide-back" href={href('resources', lang)}>{t(tx.backToResources)}</a>
+    <p class="section-label">{t(tx.label)}</p>
+    <h1 class="section-title guide-title">{t(guide.title)}</h1>
+    <p class="guide-sub">{t(guide.sub)}</p>
+
+    <div class="guide-coming-soon">
+      <div class="guide-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+      </div>
+      <h2>{t(tx.comingSoonTitle)}</h2>
+      <p>{t(tx.comingSoonBody)}</p>
+      <a class="btn-primary" href={href('contact', lang)}>{t(tx.cta)}</a>
+    </div>
+  </div>
+</section>

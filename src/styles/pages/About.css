@@ -26,6 +26,7 @@
   width: 100%;
   position: relative;
 }
+.about-content h1,
 .about-content h2 {
   font-family: var(--font-disp);
   margin-bottom: 28px;

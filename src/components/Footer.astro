@@ -1,0 +1,43 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+import { SHOW_REVIEWS } from '../lib/flags.js'
+import { href } from '../lib/routes.js'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations
+const h = (k) => href(k, lang)
+---
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href={h('home')}>Eugenie <span>Do</span></a>
+        <p>{t(tx.footer.tagline)}</p>
+      </div>
+      <div class="footer-col">
+        <h4>{t(tx.footer.nav)}</h4>
+        <ul>
+          <li><a href={h('about')}>{t(tx.nav.about)}</a></li>
+          {SHOW_REVIEWS && <li><a href={h('reviews')}>{t(tx.nav.reviews)}</a></li>}
+          <li><a href={h('resources')}>{t(tx.nav.resources)}</a></li>
+          <li><a href={h('blog')}>{t(tx.nav.blog)}</a></li>
+          <li><a href={h('contact')}>{t(tx.nav.contact)}</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>{t(tx.footer.help)}</h4>
+        <ul>
+          <li><button>{t(tx.footer.terms)}</button></li>
+          <li><a href={h('privacy')}>{t(tx.footer.privacy)}</a></li>
+          <li><a href="mailto:contact@eugeniedo.com">contact@eugeniedo.com</a></li>
+          <li><a href="tel:+14384102420">(438) 410-2420</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>{t(tx.footer.copy)}</span>
+      <span>{t(tx.footer.region)}</span>
+    </div>
+  </div>
+</footer>

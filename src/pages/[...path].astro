@@ -1,0 +1,25 @@
+---
+// Generates one static HTML page per route and language (see src/lib/routes.js).
+import Base from '../layouts/Base.astro'
+import Home from '../views/Home.astro'
+import About from '../views/About.astro'
+import Reviews from '../views/Reviews.astro'
+import Blog from '../views/Blog.astro'
+import Resources from '../views/Resources.astro'
+import Guide from '../views/Guide.astro'
+import Contact from '../views/Contact.astro'
+import Privacy from '../views/Privacy.astro'
+import { ROUTES, LANGS } from '../lib/routes.js'
+
+export function getStaticPaths() {
+  return Object.entries(ROUTES).flatMap(([page, r]) =>
+    LANGS.map((lang) => ({ params: { path: r[lang].replace(/^\/|\/$/g, '') }, props: { page, lang } })))
+}
+
+const { page, lang } = Astro.props
+const VIEWS = { home: Home, about: About, reviews: Reviews, blog: Blog, resources: Resources, contact: Contact, privacy: Privacy }
+const View = page.startsWith('guide-') ? Guide : VIEWS[page]
+---
+<Base lang={lang} page={page}>
+  <View lang={lang} guideKey={page} />
+</Base>

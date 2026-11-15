@@ -1,0 +1,44 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations.newsletter
+---
+<div class="newsletter-strip">
+  <div class="container">
+    <div class="newsletter-inner">
+      <div class="newsletter-text">
+        <h3>{t(tx.title)}</h3>
+        <p>{t(tx.sub)}</p>
+      </div>
+      <p class="newsletter-done" hidden>{t(tx.done)}</p>
+      <form class="newsletter-form" data-lang={lang} data-btn={t(tx.btn)}>
+        <input type="email" name="email" required placeholder={t(tx.placeholder)} />
+        <button type="submit">{t(tx.btn)}</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { supabaseInsert } from '../lib/supabase.js'
+
+  document.querySelectorAll('form.newsletter-form').forEach((form) => {
+    const btn = form.querySelector('button')
+    const done = form.parentElement.querySelector('.newsletter-done')
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      btn.disabled = true
+      btn.textContent = '…'
+      try {
+        await supabaseInsert('newsletter', { email: form.email.value, source: 'eugeniedo.com-newsletter', lang: form.dataset.lang })
+        form.hidden = true
+        done.hidden = false
+      } catch {
+        // Same behaviour as before: the button comes back so the visitor can retry
+        btn.textContent = form.dataset.btn
+        btn.disabled = false
+      }
+    })
+  })
+</script>

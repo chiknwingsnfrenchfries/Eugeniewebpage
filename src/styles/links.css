@@ -1,0 +1,67 @@
+/* The React site used <button>s for internal navigation. The Astro site uses
+   real <a href> links (crawlable, shareable, open in new tab). These rules give
+   those links the same look the buttons had. */
+
+/* Buttons are inline-block by default; links are inline. */
+a:is(.nav-logo, .nav-link, .nav-cta, .lang-toggle, .footer-logo, .read-more,
+     .read-all-btn, .resource-link, .guide-back, .btn-primary, .btn-outline) {
+  display: inline-block;
+}
+a.nav-logo, a.nav-dropdown-trigger { display: flex; }
+
+/* Menus toggled by script use the hidden attribute; component CSS sets
+   display:flex on them, which would otherwise override it. */
+[hidden] { display: none !important; }
+
+/* Menu items that were buttons: the original button rules, mirrored for links
+   (same specificity, so the cascade with .mob-cta, .mob-lang etc. is unchanged). */
+.nav-dropdown a {
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--mid);
+  cursor: pointer;
+  text-align: left;
+  white-space: normal;
+  background: 0 0;
+  border: none;
+  border-radius: 3px;
+  padding: 11px 14px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.nav-dropdown a:hover {
+  background: var(--cream);
+  color: var(--rose);
+}
+.mobile-drawer a {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  cursor: pointer;
+  text-align: left;
+  background: 0 0;
+  border: none;
+  border-bottom: 1px solid #0000000f;
+  padding: 14px 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.mobile-drawer a:hover {
+  color: var(--rose);
+}
+.mob-dropdown a {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  border-bottom: 1px solid #0000000d !important;
+  padding: 12px 8px !important;
+  font-size: 0.78rem !important;
+  font-weight: 400 !important;
+}
+.mob-dropdown a:last-child {
+  border-bottom: none !important;
+}

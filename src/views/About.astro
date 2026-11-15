@@ -1,0 +1,41 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+import { href } from '../lib/routes.js'
+import Newsletter from '../components/Newsletter.astro'
+import FadeUp from '../components/FadeUp.astro'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations.about
+---
+<div>
+  <section class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-img-wrap">
+          <img src="/assets/eugenie-about.jpg" alt="Eugenie Do"
+            onerror="this.parentElement.style.background='var(--blush)';this.style.display='none'" />
+        </div>
+        <div class="about-content fade-up">
+          <p class="section-label">{t(tx.label)}</p>
+          <h1>{t(tx.title)}</h1>
+          <p>{t(tx.p1)}</p>
+          <p>{t(tx.p2)}</p>
+          <p>{t(tx.p3)}</p>
+          <p>{t(tx.p4)}</p>
+          <p>{t(tx.p5)}</p>
+          <div class="about-facts">
+            <p class="section-label" style="margin-top: 8px">{t(tx.factsLabel)}</p>
+            <div class="about-fact"><strong>{t(tx.factsArea)}</strong><span>{t(tx.factsAreaVal)}</span></div>
+            <div class="about-fact"><strong>{t(tx.factsSpec)}</strong><span>{t(tx.factsSpecVal)}</span></div>
+          </div>
+          <div style="margin-top: 36px">
+            <a class="btn-primary" href={href('contact', lang)}>{t(tx.cta)}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <Newsletter lang={lang} />
+</div>
+<FadeUp />

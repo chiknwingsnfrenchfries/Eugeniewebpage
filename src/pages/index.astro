@@ -1,0 +1,31 @@
+---
+// eugeniedo.com/ → /fr/ or /en/.
+// Old hash links (eugeniedo.com/#/fr/about) are sent to their new URL.
+// Without JavaScript, the meta refresh goes to the French home page.
+import { ROUTES } from '../lib/routes.js'
+const map = Object.fromEntries(Object.entries(ROUTES).map(([k, r]) => [k, { en: r.en, fr: r.fr }]))
+---
+<!DOCTYPE html>
+<html lang="fr-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eugenie Do – Courtière immobilière résidentielle | Residential Real Estate Broker</title>
+    <meta name="description" content="Eugenie Do, courtière immobilière résidentielle chez RE/MAX Platine, Grand Montréal. Residential real estate broker at RE/MAX Platine, Greater Montreal." />
+    <link rel="canonical" href="https://eugeniedo.com/fr/" />
+    <link rel="alternate" hreflang="fr-CA" href="https://eugeniedo.com/fr/" />
+    <link rel="alternate" hreflang="en-CA" href="https://eugeniedo.com/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://eugeniedo.com/fr/" />
+    <script is:inline define:vars={{ map }}>
+      var parts = location.hash.replace(/^#\/?/, '').split('/')
+      var lang = parts[0] === 'fr' || parts[0] === 'en' ? parts[0]
+        : ((navigator.language || 'fr').toLowerCase().indexOf('fr') === 0 ? 'fr' : 'en')
+      var page = map[parts[1]] ? parts[1] : 'home'
+      location.replace(map[page][lang] + location.search)
+    </script>
+    <meta http-equiv="refresh" content="0; url=/fr/" />
+  </head>
+  <body>
+    <p><a href="/fr/">Français</a> · <a href="/en/">English</a></p>
+  </body>
+</html>

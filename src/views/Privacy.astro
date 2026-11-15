@@ -1,0 +1,11 @@
+---
+// Placeholder until the real privacy policy is written (kept out of search via noindex in routes.js).
+const { lang } = Astro.props
+const fr = lang === 'fr'
+---
+<section class="guide-section">
+  <div class="container">
+    <h1 class="section-title guide-title">{fr ? 'Politique de confidentialité' : 'Privacy Policy'}</h1>
+    <p class="guide-sub">{fr ? 'Cette page sera bientôt disponible.' : 'This page is coming soon.'}</p>
+  </div>
+</section>

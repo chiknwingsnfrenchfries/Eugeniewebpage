@@ -1,0 +1,33 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations.reviewsPage
+const items = translations.testimonials.items
+const initials = (name) => name.split(' ').map(n => n[0]).join('')
+const photo = (p) => p.replace(/^\.\//, '/')
+---
+<section class="reviews-section">
+  <div class="container">
+    <p class="section-label">{t(tx.label)}</p>
+    <h1 class="section-title reviews-title">{t(tx.title1)}<br />{t(tx.title2)}</h1>
+    <div class="reviews-grid">
+      {items.map(item => (
+        <div class="review-card">
+          <div class="review-photo">
+            <img src={photo(item.photo)} alt={item.name}
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+            <div class="review-photo-fallback">{initials(item.name)}</div>
+          </div>
+          <div class="stars">★★★★★</div>
+          <blockquote>{t(item.quote)}</blockquote>
+          <cite>{item.name}<span>{t(item.role)}</span></cite>
+        </div>
+      ))}
+    </div>
+    <div class="reviews-more">
+      <a href={tx.googleUrl} target="_blank" rel="noopener" class="btn-outline">{t(tx.seeMore)}</a>
+    </div>
+  </div>
+</section>

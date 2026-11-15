@@ -1,0 +1,128 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+import { SHOW_REVIEWS } from '../lib/flags.js'
+import { href } from '../lib/routes.js'
+import Newsletter from '../components/Newsletter.astro'
+import InstagramFeed from '../components/InstagramFeed.astro'
+import FadeUp from '../components/FadeUp.astro'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations
+const h = (k) => href(k, lang)
+
+const ICONS = [
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+]
+const initials = (name) => name.split(' ').map(n => n[0]).join('')
+const photo = (p) => p.replace(/^\.\//, '/')
+---
+<div class="home">
+  {/* HERO — .hero-bg is the full-bleed band, .hero is capped so it doesn't stretch on ultra-wide screens */}
+  <div class="hero-bg">
+    <section class="hero">
+      <div class="hero-left">
+        <p class="hero-eyebrow">{t(tx.hero.eyebrow)}</p>
+        <h1 class="hero-title">
+          {t(tx.hero.title1)}<br />
+          {t(tx.hero.title2)}<em>{t(tx.hero.titleEm)}</em>{t(tx.hero.title3)}
+        </h1>
+        <p class="hero-sub">{t(tx.hero.sub)}</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href={h('contact')}>{t(tx.hero.cta1)}</a>
+          <a class="btn-outline" href={h('about')}>{t(tx.hero.cta2)}</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <picture>
+          <source media="(max-width: 960px)" srcset="/assets/eugenie-hero-mobile.jpg" />
+          <img src="/assets/eugenie-hero.jpg" alt="Eugenie Do" fetchpriority="high" onerror="this.style.display='none'" />
+        </picture>
+        <div class="hero-badges">
+          <div class="hero-badge hero-badge-logo">
+            <img src="/assets/remax-platine.png" alt="RE/MAX Platine" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  {/* SERVICES */}
+  <section class="services-section">
+    <div class="container">
+      <p class="section-label">{t(tx.services.label)}</p>
+      <h2 class="section-title" style="margin-bottom: 56px">{t(tx.services.title)}</h2>
+      <div class="services-grid">
+        {tx.services.items.map((s, i) => (
+          <div class="service-card fade-up">
+            <div class="service-icon" set:html={ICONS[i]} />
+            <h3>{t(s.title)}</h3>
+            <p>{t(s.body)}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* TESTIMONIALS */}
+  {SHOW_REVIEWS && (
+    <section class="testimonials-section">
+      <div class="container">
+        <p class="section-label">{t(tx.testimonials.label)}</p>
+        <h2 class="section-title" style="margin-bottom: 48px">
+          {t(tx.testimonials.title1)}<br />{t(tx.testimonials.title2)}
+        </h2>
+        <div class="testimonials-grid">
+          {tx.testimonials.items.map(item => (
+            <div class="testimonial-card fade-up">
+              <div class="testimonial-photo">
+                <img src={photo(item.photo)} alt={item.name}
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <div class="testimonial-photo-fallback">{initials(item.name)}</div>
+              </div>
+              <div class="stars">★★★★★</div>
+              <blockquote>{t(item.quote)}</blockquote>
+              <cite>{item.name}<span>{t(item.role)}</span></cite>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* NEWSLETTER */}
+  <Newsletter lang={lang} />
+
+  {/* BLOG PREVIEW */}
+  <section class="blog-preview-section">
+    <div class="container">
+      <div class="blog-header">
+        <div>
+          <p class="section-label">{t(tx.blog.label)}</p>
+          <h2 class="section-title">{t(tx.blog.title1)}<br />{t(tx.blog.title2)}</h2>
+        </div>
+        <a class="read-all-btn" href={h('blog')}>{t(tx.blog.readAll)}</a>
+      </div>
+      <div class="blog-grid">
+        {tx.blog.posts.map((p, i) => (
+          <div class="blog-card fade-up">
+            <div class="blog-card-img" style={`background: ${['var(--blush)','#ddd8d0','#ccc6bc'][i]}`} />
+            <p class="blog-meta">{t(p.date)} · <span>{t(p.tag)}</span></p>
+            <h3>{t(p.title)}</h3>
+            <p>{t(p.excerpt)}</p>
+            <a class="read-more" href={h('blog')}>{t(tx.blog.readMore)}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* INSTAGRAM */}
+  <InstagramFeed lang={lang} />
+</div>
+<FadeUp />

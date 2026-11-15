@@ -1,0 +1,27 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+import { href } from '../lib/routes.js'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations.resources
+
+// A card either opens an external link, goes to an internal page, or falls back to Contact
+const link = (r) => r.href ? r.href : href(r.page || 'contact', lang)
+---
+<section class="resources-section">
+  <div class="container">
+    <p class="section-label">{t(tx.label)}</p>
+    <h1 class="section-title resources-title">{t(tx.title1)}<br />{t(tx.title2)}</h1>
+    <div class="resources-grid">
+      {tx.items.map((r) => (
+        <div class:list={['resource-card', { 'resource-card-highlight': r.highlight }]}>
+          <p class="resource-tag">{t(r.tag)}</p>
+          <h3>{t(r.title)}</h3>
+          <p>{t(r.body)}</p>
+          <a class="resource-link" href={link(r)} {...(r.href ? { target: '_blank', rel: 'noopener' } : {})}>{t(r.cta)} {r.href ? '↗' : '→'}</a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

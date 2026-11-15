@@ -1,0 +1,77 @@
+---
+// Shared page shell: <head> (SEO, language alternates, structured data,
+// tracking), nav, footer, and all site CSS.
+//
+// CSS is imported here, in the same order the original React app loaded it,
+// so the cascade is unchanged.
+import '../components/Nav.css'
+import '../components/Footer.css'
+import '../components/Newsletter.css'
+import '../components/InstagramFeed.css'
+import '../styles/pages/Home.css'
+import '../styles/pages/About.css'
+import '../styles/pages/Resources.css'
+import '../styles/pages/Guide.css'
+import '../styles/pages/Reviews.css'
+import '../styles/pages/Blog.css'
+import '../styles/pages/Contact.css'
+import '../index.css'
+import '@fontsource/cormorant-garamond/latin-300.css'
+import '@fontsource/cormorant-garamond/latin-300-italic.css'
+import '@fontsource/cormorant-garamond/latin-400.css'
+import '@fontsource/cormorant-garamond/latin-400-italic.css'
+import '@fontsource/cormorant-garamond/latin-500.css'
+import '@fontsource/dm-sans/latin-300.css'
+import '@fontsource/dm-sans/latin-400.css'
+import '@fontsource/dm-sans/latin-500.css'
+import '../styles/links.css'
+import favicon from '../assets-favicon.svg?url'
+
+import Tracking from '../components/Tracking.astro'
+import Nav from '../components/Nav.astro'
+import Footer from '../components/Footer.astro'
+import { ROUTES, LANGS } from '../lib/routes.js'
+import { SEO } from '../lib/seo.js'
+import { agentSchema } from '../lib/schema.js'
+
+const { lang, page, title: titleOverride, description: descOverride } = Astro.props
+const site = 'https://eugeniedo.com'
+const route = ROUTES[page]
+const seo = SEO[page] || {}
+const title = titleOverride || seo.title?.[lang]
+const description = descOverride || seo.description?.[lang]
+const canonical = site + route[lang]
+const ogLocale = lang === 'fr' ? 'fr_CA' : 'en_CA'
+---
+<!DOCTYPE html>
+<html lang={lang === 'fr' ? 'fr-CA' : 'en-CA'}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Tracking />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {route.noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    {LANGS.map(l => <link rel="alternate" hreflang={l === 'fr' ? 'fr-CA' : 'en-CA'} href={site + route[l]} />)}
+    <link rel="alternate" hreflang="x-default" href={site + route.fr} />
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Eugenie Do – RE/MAX Platine" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${site}/assets/eugenie-hero.jpg`} />
+    <meta property="og:locale" content={ogLocale} />
+    <script type="application/ld+json" set:html={JSON.stringify(agentSchema(lang))} />
+    <slot name="head" />
+  </head>
+  <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T74GLFPF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <div style="padding-top: var(--nav-h)">
+      <Nav lang={lang} current={page} />
+      <slot />
+      <Footer lang={lang} />
+    </div>
+  </body>
+</html>

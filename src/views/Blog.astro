@@ -1,0 +1,25 @@
+---
+import { translations, useLang } from '../lib/i18n.js'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const tx = translations.blogPage
+const BG = ['var(--blush)','#ddd8d0','#ccc6bc','#b8b0a6','#d0c8be','#e0d8ce']
+---
+<section class="blog-section">
+  <div class="container">
+    <p class="section-label">{t(tx.label)}</p>
+    <h1 class="section-title blog-title">{t(tx.title1)}<br />{t(tx.title2)}</h1>
+    <div class="blog-full-grid">
+      {tx.posts.map((p, i) => (
+        <div class="blog-card">
+          <div class="blog-card-img" style={`background: ${BG[i]}`} />
+          <p class="blog-meta">{t(p.date)} · <span>{t(p.tag)}</span></p>
+          <h3>{t(p.title)}</h3>
+          <p>{t(p.excerpt)}</p>
+          <button class="read-more">{t(translations.blog.readMore)}</button>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
