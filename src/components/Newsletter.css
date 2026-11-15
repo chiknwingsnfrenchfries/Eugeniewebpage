@@ -1,0 +1,64 @@
+.newsletter-strip {
+  background: var(--blush);
+  padding: 60px 0;
+}
+.newsletter-inner {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+  display: flex;
+}
+.newsletter-text h3 {
+  font-family: var(--font-disp);
+  margin-bottom: 6px;
+  font-size: 1.6rem;
+  font-weight: 300;
+}
+.newsletter-text p {
+  color: var(--mid);
+  font-size: 0.88rem;
+}
+.newsletter-form {
+  flex: 0 0 420px;
+  display: flex;
+}
+.newsletter-form input {
+  background: var(--white);
+  font-family: var(--font-body);
+  border: 1px solid #0000001f;
+  border-right: none;
+  border-radius: 2px 0 0 2px;
+  outline: none;
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 0.9rem;
+}
+.newsletter-form input:focus {
+  border-color: var(--rose);
+}
+.newsletter-form button {
+  background: var(--rose);
+  color: var(--white);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: 0 2px 2px 0;
+  padding: 14px 24px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.newsletter-form button:hover:not(:disabled) {
+  background: var(--rose-dk);
+}
+.newsletter-done {
+  color: var(--rose);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+@media (width<=760px) {
+  .newsletter-form {
+    flex: 100%;
+  }
+}

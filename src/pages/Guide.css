@@ -1,0 +1,72 @@
+.guide-section {
+  background: var(--cream);
+  min-height: 100vh;
+  padding: 100px 0;
+}
+.guide-back {
+  letter-spacing: 0.05em;
+  color: var(--mid);
+  cursor: pointer;
+  background: 0 0;
+  border: none;
+  margin-bottom: 40px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.guide-back:hover {
+  color: var(--rose);
+}
+.guide-title {
+  margin-bottom: 8px;
+}
+.guide-sub {
+  color: var(--rose);
+  margin-bottom: 56px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.guide-coming-soon {
+  background: var(--white);
+  text-align: center;
+  border: 1px solid #00000014;
+  border-radius: 4px;
+  max-width: 520px;
+  padding: 56px 48px;
+}
+.guide-icon {
+  background: var(--blush);
+  width: 56px;
+  height: 56px;
+  color: var(--rose);
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 28px;
+  display: flex;
+}
+.guide-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.guide-coming-soon h2 {
+  font-family: var(--font-disp);
+  color: var(--dark);
+  margin-bottom: 16px;
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+.guide-coming-soon p {
+  color: var(--mid);
+  margin-bottom: 32px;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+@media (width<=640px) {
+  .guide-section {
+    padding: 64px 0;
+  }
+  .guide-coming-soon {
+    padding: 40px 28px;
+  }
+}
