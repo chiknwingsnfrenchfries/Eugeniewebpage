@@ -81,4 +81,11 @@ export const SEO = {
       fr: 'Politique de confidentialité de eugeniedo.com.',
     },
   },
+  terms: {
+    title: { en: 'Terms & Conditions | Eugenie Do', fr: "Conditions d'utilisation | Eugenie Do" },
+    description: {
+      en: 'Terms and conditions for eugeniedo.com.',
+      fr: "Conditions d'utilisation de eugeniedo.com.",
+    },
+  },
 }

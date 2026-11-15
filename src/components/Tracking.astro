@@ -1,26 +1,41 @@
 ---
-// Consent banner, analytics and tag manager, in the order they must load:
-// 1. CookieYes (reads/asks consent; also sets Google Consent Mode defaults if
-//    enabled in the CookieYes dashboard, so it must come before GTM)
-// 2. RudderStack, with consent read from the CookieYes cookie
+// Analytics and tag manager. Order matters:
+// 1. Consent defaults (Google Consent Mode) — must come before GTM
+// 2. RudderStack, with consent read from the consent banner's cookie
 // 3. Google Tag Manager
+//
+// NO CONSENT BANNER YET. CookieYes is licensed for quiz.eugeniedo.com only, and
+// the plan is to move to GetTerms. Until a banner is installed here, nobody can
+// change the defaults below, so:
+// - analytics + functional: allowed (RudderStack events, GA-style measurement)
+// - marketing/ads + performance: denied. Google Ads tags in GTM run in Consent
+//   Mode "cookieless" mode: conversions are still pinged and modelled, but no ad
+//   cookies are set. Our own gclid capture (stored with the lead) is unaffected.
+// When the new banner is added: load its script FIRST (above everything here),
+// have it update Google Consent Mode, and point cmpValue() at its cookie.
 //
 // Bugs from the quiz build that must not come back:
 // - load() is called from the SDK tag's onload, never from a separate block
 //   below an async tag.
-// - With no CookieYes cookie yet, analytics + functional default to allowed and
+// - With no consent cookie yet, analytics + functional default to allowed and
 //   marketing + performance to denied. Testing === 'yes' alone blocks every new visitor.
 // - RudderStack v3 takes consent as allowedConsentIds / deniedConsentIds.
 //   (The quiz passes a getConsent() function, which the SDK ignores.)
-// - CookieYes names the ad category "advertisement" in its cookie and fires
-//   "cookieyes_consent_update" (underscores). Both are handled here.
-const COOKIEYES_ID = '95bca4ef9c5872f825a945271ec0d765'
-// RudderStack write key and data plane URL are in initRudderStack() below:
-// that script must stay global (no define:vars), so they are written inline.
 const GTM_ID = 'GTM-T74GLFPF'
 ---
-<script id="cookieyes" is:inline src={`https://cdn-cookieyes.com/client_data/${COOKIEYES_ID}/script.js`}></script>
-
+<script is:inline>
+  window.dataLayer = window.dataLayer || []
+  function gtag() { window.dataLayer.push(arguments) }
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'granted',
+    functionality_storage: 'granted',
+    personalization_storage: 'denied',
+    security_storage: 'granted',
+  })
+</script>
 <script is:inline>
   // Calls made before the SDK loads are queued here and replayed in initRudderStack().
   window.rsQueue = window.rsQueue || []
@@ -33,7 +48,10 @@ const GTM_ID = 'GTM-T74GLFPF'
       window.rsQueue.push(args)
     }
   }
-  function cookieYesValue(category) {
+  // Reads a category from the consent banner's cookie. Currently the CookieYes
+  // format, which is never present on this domain (see note at the top), so the
+  // defaults apply. Replace when the GetTerms banner is installed.
+  function cmpValue(category) {
     try {
       var m = document.cookie.match(/(?:^|;\s*)cookieyes-consent=([^;]+)/)
       if (!m) return null
@@ -42,13 +60,13 @@ const GTM_ID = 'GTM-T74GLFPF'
     } catch (e) { return null }
   }
   window.consentState = function () {
-    var a = cookieYesValue('analytics'), f = cookieYesValue('functional')
+    var a = cmpValue('analytics'), f = cmpValue('functional')
     return {
       necessary: true,
       analytics: a === null ? true : a === 'yes',
       functional: f === null ? true : f === 'yes',
-      marketing: cookieYesValue('advertisement') === 'yes' || cookieYesValue('marketing') === 'yes',
-      performance: cookieYesValue('performance') === 'yes',
+      marketing: cmpValue('advertisement') === 'yes' || cmpValue('marketing') === 'yes',
+      performance: cmpValue('performance') === 'yes',
     }
   }
   function rsConsentOptions() {
@@ -64,6 +82,7 @@ const GTM_ID = 'GTM-T74GLFPF'
     window.rs('page')
     var q = window.rsQueue.splice(0)
     for (var i = 0; i < q.length; i++) window.rs.apply(null, q[i])
+    // CookieYes event name; update together with cmpValue() for the new banner
     document.addEventListener('cookieyes_consent_update', function () {
       window.rudderanalytics.consent(rsConsentOptions())
     })

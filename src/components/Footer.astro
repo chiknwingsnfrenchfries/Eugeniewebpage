@@ -28,7 +28,7 @@ const h = (k) => href(k, lang)
       <div class="footer-col">
         <h4>{t(tx.footer.help)}</h4>
         <ul>
-          <li><button>{t(tx.footer.terms)}</button></li>
+          <li><a href={h('terms')}>{t(tx.footer.terms)}</a></li>
           <li><a href={h('privacy')}>{t(tx.footer.privacy)}</a></li>
           <li><a href="mailto:contact@eugeniedo.com">contact@eugeniedo.com</a></li>
           <li><a href="tel:+14384102420">(438) 410-2420</a></li>

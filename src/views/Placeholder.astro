@@ -1,0 +1,15 @@
+---
+// Empty legal pages until the real texts are written (kept out of search via noindex in routes.js).
+const { lang, page } = Astro.props
+const TITLES = {
+  privacy: { fr: 'Politique de confidentialité', en: 'Privacy Policy' },
+  terms: { fr: "Conditions d'utilisation", en: 'Terms & Conditions' },
+}
+const fr = lang === 'fr'
+---
+<section class="guide-section">
+  <div class="container">
+    <h1 class="section-title guide-title">{TITLES[page][lang]}</h1>
+    <p class="guide-sub">{fr ? 'Cette page sera bientôt disponible.' : 'This page is coming soon.'}</p>
+  </div>
+</section>

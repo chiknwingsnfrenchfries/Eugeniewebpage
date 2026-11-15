@@ -24,7 +24,7 @@ src/lib/flags.js         SHOW_REVIEWS
 src/lib/supabase.js      supabaseInsert() used by the forms
 src/layouts/Base.astro   <head>, nav, footer, CSS (imported in the original cascade order)
 src/components/          Nav, Footer, Newsletter, InstagramFeed, Tracking, FadeUp
-src/views/               one file per page type
+src/views/               one file per page type (Placeholder.astro: empty privacy + terms pages)
 src/pages/[...path].astro  generates every route from routes.js
 src/pages/index.astro    "/" → /fr/ or /en/; also redirects old #/fr/about style links
 src/styles/              page CSS + links.css (makes <a> links look like the old buttons)
@@ -42,8 +42,11 @@ are left out of the sitemap.
 
 ## Tracking
 
-`src/components/Tracking.astro` loads, in order: CookieYes, RudderStack (consent read from the
-CookieYes cookie), Google Tag Manager. Comments in that file list the bugs that must not come back.
+`src/components/Tracking.astro` sets Google Consent Mode defaults, then loads RudderStack and
+Google Tag Manager. **There is no consent banner on this site yet** (CookieYes is licensed for
+the quiz subdomain only; GetTerms is planned). Until one is added, analytics is allowed and
+ad/marketing storage is denied. The comments at the top of that file explain how to plug in the
+new banner and list the bugs that must not come back.
 
 ## History
 

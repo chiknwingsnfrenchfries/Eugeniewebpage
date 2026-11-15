@@ -35,6 +35,7 @@ export const ROUTES = {
   },
   contact:   { en: '/en/contact/', fr: '/fr/contact/' },
   privacy:   { en: '/en/privacy/', fr: '/fr/confidentialite/', noindex: true },
+  terms:     { en: '/en/terms/', fr: '/fr/conditions-utilisation/', noindex: true },
 }
 
 // URL of a page in a language: href('about', 'fr') → '/fr/a-propos/'
