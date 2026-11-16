@@ -1,0 +1,42 @@
+<script is:inline>
+  // Remembers ad attribution from the landing URL so it can be saved with a lead
+  // later in the visit, even if the visitor browses to other pages first.
+  //
+  // - gclid / gbraid / wbraid (Google Ads click IDs) and utm_* are read from the
+  //   URL on every page load. New values replace old ones (last ad click wins).
+  // - Kept in sessionStorage for the visit.
+  // - Copied to a 90-day first-party cookie ONLY if the visitor has accepted
+  //   Marketing in the consent banner, so a later visit can still be attributed.
+  // window.getAttribution() returns the merged values (URL > session > cookie).
+  (function () {
+    var KEYS = ['gclid', 'gbraid', 'wbraid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+    var SS_KEY = 'ed_attribution', COOKIE = 'ed_attribution'
+    function fromUrl() {
+      var p = new URLSearchParams(location.search), out = {}
+      KEYS.forEach(function (k) { var v = p.get(k); if (v) out[k] = v.slice(0, 300) })
+      return out
+    }
+    function readSession() { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || '{}') } catch (e) { return {} } }
+    function readCookie() {
+      try { var m = document.cookie.match(/(?:^|;\s*)ed_attribution=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : {} } catch (e) { return {} }
+    }
+    var url = fromUrl()
+    // A new ad click or campaign link replaces the whole set, so values from
+    // different clicks are never mixed.
+    var current = Object.keys(url).length ? url : readSession()
+    try { sessionStorage.setItem(SS_KEY, JSON.stringify(current)) } catch (e) {}
+
+    function persistIfAllowed() {
+      var c = window.siteConsent
+      if (!c || !c.marketing || !Object.keys(current).length) return
+      document.cookie = COOKIE + '=' + encodeURIComponent(JSON.stringify(current)) + ';path=/;max-age=' + 60 * 60 * 24 * 90 + ';SameSite=Lax;Secure'
+    }
+    window.addEventListener('getterms:consent', function () { setTimeout(persistIfAllowed, 0) })
+
+    window.getAttribution = function () {
+      var merged = {}, sources = [readCookie(), current]
+      sources.forEach(function (s) { for (var k in s) if (KEYS.indexOf(k) > -1 && s[k]) merged[k] = s[k] })
+      return merged
+    }
+  })()
+</script>

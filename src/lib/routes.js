@@ -13,6 +13,10 @@ export const ROUTES = {
   reviews:   { en: '/en/reviews/', fr: '/fr/avis/', noindex: !SHOW_REVIEWS },
   blog:      { en: '/en/blog/', fr: '/fr/blogue/', noindex: true },
   resources: { en: '/en/client-resources/', fr: '/fr/ressources-clients/' },
+  'home-valuation': {
+    en: '/en/client-resources/home-valuation/',
+    fr: '/fr/ressources-clients/estimation-maison/',
+  },
   'guide-island': {
     en: '/en/client-resources/island-of-montreal-buyers-guide/',
     fr: '/fr/ressources-clients/guide-acheteur-ile-de-montreal/',

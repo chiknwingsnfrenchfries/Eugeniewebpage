@@ -39,6 +39,16 @@ export const SEO = {
       fr: "Guides de l'acheteur pour Montréal, la Rive-Nord et la Rive-Sud, quiz de quartier et autres outils pour acheter dans le Grand Montréal.",
     },
   },
+  'home-valuation': {
+    title: {
+      en: "What's My Home Worth? Free Home Valuation | Eugenie Do, RE/MAX Platine",
+      fr: 'Estimation gratuite de la valeur de votre maison | Eugenie Do, RE/MAX Platine',
+    },
+    description: {
+      en: 'How much is your house or condo worth today? Get a free market value estimate, prepared by a real estate broker, within 24 hours. No obligation.',
+      fr: "Combien vaut votre maison ou votre condo aujourd'hui? Recevez une estimation gratuite de sa valeur marchande, préparée par une courtière, en 24 heures. Sans engagement.",
+    },
+  },
   'guide-island': {
     title: { en: "Island of Montreal Buyer's Guide | Eugenie Do", fr: "Guide de l'acheteur — Île de Montréal | Eugenie Do" },
     description: {

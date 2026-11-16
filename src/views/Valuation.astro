@@ -1,0 +1,295 @@
+---
+// Free home valuation request page — landing page for the Google Ads seller campaign.
+// One job: get a homeowner to submit the form. No competing calls to action above it.
+import { useLang } from '../lib/i18n.js'
+import { href } from '../lib/routes.js'
+import { valuation as v, PHONE_DISPLAY, PHONE_TEL } from '../lib/valuation-copy.js'
+
+const { lang } = Astro.props
+const t = useLang(lang)
+const f = v.form
+
+// FAQ as structured data, so search engines and AI assistants can read the answers
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: v.faq.items.map((i) => ({
+    '@type': 'Question',
+    name: t(i.q),
+    acceptedAnswer: { '@type': 'Answer', text: t(i.a) },
+  })),
+}
+// Error message with the phone number as a tappable link
+const [errBefore, errAfter] = t(f.error).split(PHONE_DISPLAY)
+// Strings the browser script needs, in the page language
+const msgs = {
+  required: t(f.required),
+  invalidEmail: t(f.invalidEmail),
+  invalidPhone: t(f.invalidPhone),
+  sending: t(f.sending),
+  submit: t(f.submit),
+  thanksTitle: t(v.thanks.title),
+}
+---
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<section class="val-hero">
+  <div class="container val-hero-grid">
+    <div class="val-intro">
+      <h1 class="val-title">{t(v.h1)}</h1>
+      <p class="val-sub">{t(v.sub)}</p>
+    </div>
+
+    <div class="val-card" id="estimation-form-card">
+      <form class="val-form" id="val-form" novalidate data-lang={lang} data-msgs={JSON.stringify(msgs)}>
+        <h2 class="val-form-title">{t(f.title)}</h2>
+
+        <div class="val-field">
+          <label for="vf-address">{t(f.address)}</label>
+          <input id="vf-address" name="property_address" type="text" required autocomplete="street-address" placeholder={t(f.addressPlaceholder)} />
+          <p class="val-err" hidden></p>
+        </div>
+        <div class="val-row">
+          <div class="val-field">
+            <label for="vf-first">{t(f.firstName)}</label>
+            <input id="vf-first" name="first_name" type="text" required autocomplete="given-name" />
+            <p class="val-err" hidden></p>
+          </div>
+          <div class="val-field">
+            <label for="vf-last">{t(f.lastName)}</label>
+            <input id="vf-last" name="last_name" type="text" autocomplete="family-name" />
+          </div>
+        </div>
+        <div class="val-field">
+          <label for="vf-email">{t(f.email)}</label>
+          <input id="vf-email" name="email" type="email" required autocomplete="email" inputmode="email" />
+          <p class="val-err" hidden></p>
+        </div>
+        <div class="val-field">
+          <label for="vf-phone">{t(f.phone)}</label>
+          <input id="vf-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          <p class="val-err" hidden></p>
+        </div>
+
+        {/* Honeypot: hidden from people, bots fill it. Filled → nothing is saved. */}
+        <div class="val-hp" aria-hidden="true">
+          <label for="vf-website">Website</label>
+          <input id="vf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label class="val-check">
+          <input type="checkbox" name="marketing_consent" />
+          <span>{t(f.consent)}</span>
+        </label>
+
+        <p class="val-form-error" role="alert" hidden>{errBefore}<a href={`tel:${PHONE_TEL}`} class="val-phone">{PHONE_DISPLAY}</a>{errAfter}</p>
+
+        <button type="submit" class="btn-primary val-submit">{t(f.submit)}</button>
+
+        <p class="val-notice">
+          {t(f.notice)} <a href={href('privacy', lang)}>{t(f.privacy)}</a>
+        </p>
+      </form>
+
+      <div class="val-thanks" id="val-thanks" tabindex="-1" hidden>
+        <h2 class="val-form-title" data-thanks-title></h2>
+        <p>{t(v.thanks.body)} <a href={`tel:${PHONE_TEL}`} class="val-phone">{PHONE_DISPLAY}</a></p>
+      </div>
+    </div>
+
+    <div class="val-points-wrap">
+      <ul class="val-points">
+        {v.points.map((p) => <li>{t(p)}</li>)}
+      </ul>
+      <div class="val-agency">
+        <img src="/assets/remax-platine.png" alt="RE/MAX Platine" width="120" />
+        <p>{t(v.agency)}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="val-section">
+  <div class="container">
+    <h2 class="section-title val-h2">{t(v.how.title)}</h2>
+    <ol class="val-steps">
+      {v.how.steps.map((s, i) => (
+        <li>
+          <span class="val-step-num">{i + 1}</span>
+          <h3>{t(s.title)}</h3>
+          <p>{t(s.body)}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="val-section val-section-blush">
+  <div class="container val-narrow">
+    <h2 class="section-title val-h2">{t(v.why.title)}</h2>
+    <p class="val-lead">{t(v.why.body)}</p>
+  </div>
+</section>
+
+<section class="val-section">
+  <div class="container val-about">
+    <img class="val-about-img" src="/assets/eugenie-about.jpg" alt="Eugenie Do" loading="lazy" />
+    <div>
+      <h2 class="section-title val-h2">{t(v.about.title)}</h2>
+      <p class="val-lead">{t(v.about.body)}</p>
+      <div class="val-agency">
+        <img src="/assets/remax-platine.png" alt="RE/MAX Platine" width="120" loading="lazy" />
+        <p>{t(v.agency)}<br /><a href={`tel:${PHONE_TEL}`} class="val-phone">{PHONE_DISPLAY}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="val-section val-section-blush">
+  <div class="container val-narrow">
+    <h2 class="section-title val-h2">{t(v.faq.title)}</h2>
+    <div class="val-faq">
+      {v.faq.items.map((i) => (
+        <details>
+          <summary>{t(i.q)}</summary>
+          <p>{t(i.a)}</p>
+        </details>
+      ))}
+    </div>
+    <p class="val-back"><a class="btn-primary" href="#estimation-form-card">{t(f.submit)}</a></p>
+  </div>
+</section>
+
+<script>
+  import { supabaseInsert } from '../lib/supabase.js'
+
+  const form = document.getElementById('val-form') as HTMLFormElement
+  const thanks = document.getElementById('val-thanks') as HTMLElement
+  const btn = form.querySelector('button[type=submit]') as HTMLButtonElement
+  const formError = form.querySelector('.val-form-error') as HTMLElement
+  const lang = form.dataset.lang
+  const msgs = JSON.parse(form.dataset.msgs || '{}')
+  const w = window as any
+
+  const EMAIL_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/
+
+  // North American numbers → E.164 (+15145551234). Anything else with 8+ digits
+  // is kept as typed (with + if given). Returns '' if empty, null if invalid.
+  function toE164(raw: string): string | null {
+    const s = raw.trim()
+    if (!s) return ''
+    const digits = s.replace(/\D/g, '')
+    if (s.startsWith('+')) return digits.length >= 8 ? '+' + digits : null
+    if (digits.length === 10) return '+1' + digits
+    if (digits.length === 11 && digits.startsWith('1')) return '+' + digits
+    return null
+  }
+
+  function setError(input: HTMLInputElement, msg: string | null) {
+    const p = input.parentElement!.querySelector('.val-err') as HTMLElement | null
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false')
+    if (p) { p.textContent = msg || ''; p.hidden = !msg }
+  }
+
+  function validate() {
+    const el = form.elements as any
+    const checks: [HTMLInputElement, string | null][] = [
+      [el.property_address, el.property_address.value.trim().length < 5 ? msgs.required : null],
+      [el.first_name, !el.first_name.value.trim() ? msgs.required : null],
+      [el.email, !el.email.value.trim() ? msgs.required : !EMAIL_RE.test(el.email.value.trim()) ? msgs.invalidEmail : null],
+      [el.phone, toE164(el.phone.value) === null ? msgs.invalidPhone : null],
+    ]
+    checks.forEach(([input, msg]) => setError(input, msg))
+    const firstBad = checks.find(([, msg]) => msg)
+    if (firstBad) firstBad[0].focus()
+    return !firstBad
+  }
+
+  function showThanks(firstName: string) {
+    form.hidden = true
+    const title = thanks.querySelector('[data-thanks-title]') as HTMLElement
+    title.textContent = msgs.thanksTitle.replace('{name}', firstName)
+    thanks.hidden = false
+    thanks.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    thanks.focus({ preventScroll: true })
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    formError.hidden = true
+    if (!validate()) return
+
+    const el = form.elements as any
+    const firstName = el.first_name.value.trim()
+
+    // Honeypot filled: act as if it worked, but save and track nothing
+    if (el.website.value) { showThanks(firstName); return }
+
+    const attribution = (w.getAttribution && w.getAttribution()) || {}
+    const phone = toE164(el.phone.value) || null
+    const email = el.email.value.trim().toLowerCase()
+    const marketingConsent = el.marketing_consent.checked
+    const lead = {
+      source: 'eugeniedo.com-estimation',
+      lang,
+      property_address: el.property_address.value.trim(),
+      first_name: firstName,
+      last_name: el.last_name.value.trim() || null,
+      email,
+      phone,
+      marketing_consent: marketingConsent,
+      source_url: window.location.href,
+      utm_source: attribution.utm_source || null,
+      utm_medium: attribution.utm_medium || null,
+      utm_campaign: attribution.utm_campaign || null,
+      utm_content: attribution.utm_content || null,
+      utm_term: attribution.utm_term || null,
+      gclid: attribution.gclid || null,
+      gbraid: attribution.gbraid || null,
+      wbraid: attribution.wbraid || null,
+    }
+
+    btn.disabled = true
+    btn.textContent = msgs.sending
+    try {
+      await supabaseInsert('leads', lead)
+    } catch (err) {
+      console.error(err)
+      formError.hidden = false
+      btn.disabled = false
+      btn.textContent = msgs.submit
+      return
+    }
+
+    // Saved. Tracking fires only now, once.
+    w.dataLayer = w.dataLayer || []
+    w.dataLayer.push({ event: 'estimation_submitted' })
+    w.rs && w.rs('track', 'Valuation Requested', {
+      lang,
+      has_phone: !!phone,
+      marketing_consent: marketingConsent,
+      has_gclid: !!(lead.gclid || lead.gbraid || lead.wbraid),
+      utm_source: lead.utm_source,
+      utm_medium: lead.utm_medium,
+      utm_campaign: lead.utm_campaign,
+      utm_content: lead.utm_content,
+      utm_term: lead.utm_term,
+    })
+    w.rs && w.rs('identify', email, { firstName, email, phone, marketing_consent: marketingConsent, lang })
+
+    showThanks(firstName)
+  })
+
+  // Clear a field's error as soon as the visitor edits it
+  form.addEventListener('input', (e) => {
+    const input = e.target as HTMLInputElement
+    if (input.getAttribute('aria-invalid') === 'true') setError(input, null)
+  })
+
+  // Phone clicks on this page (Google Ads phone-click conversion in GTM)
+  document.querySelectorAll('a.val-phone').forEach((a) => a.addEventListener('click', () => {
+    w.dataLayer = w.dataLayer || []
+    w.dataLayer.push({ event: 'estimation_phone_click' })
+    w.rs && w.rs('track', 'Phone Clicked', { page: 'home-valuation', lang })
+  }))
+</script>

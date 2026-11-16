@@ -9,6 +9,7 @@ import Resources from '../views/Resources.astro'
 import Guide from '../views/Guide.astro'
 import Contact from '../views/Contact.astro'
 import Placeholder from '../views/Placeholder.astro'
+import Valuation from '../views/Valuation.astro'
 import { ROUTES, LANGS } from '../lib/routes.js'
 
 export function getStaticPaths() {
@@ -17,7 +18,7 @@ export function getStaticPaths() {
 }
 
 const { page, lang } = Astro.props
-const VIEWS = { home: Home, about: About, reviews: Reviews, blog: Blog, resources: Resources, contact: Contact, privacy: Placeholder, terms: Placeholder }
+const VIEWS = { home: Home, about: About, reviews: Reviews, blog: Blog, resources: Resources, contact: Contact, privacy: Placeholder, terms: Placeholder, 'home-valuation': Valuation }
 const View = page.startsWith('guide-') ? Guide : VIEWS[page]
 ---
 <Base lang={lang} page={page}>

@@ -29,6 +29,7 @@ const h = (k) => href(k, lang)
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" /></svg>
         </button>
         <div class="nav-dropdown" id="nav-dd" hidden>
+          <a href={h('home-valuation')}>{t(menu.homeValuation)}</a>
           <a href={h('guide-island')}>{t(menu.islandGuide)}</a>
           <a href={h('guide-north')}>{t(menu.northGuide)}</a>
           <a href={h('guide-south')}>{t(menu.southGuide)}</a>
@@ -60,6 +61,7 @@ const h = (k) => href(k, lang)
     <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" /></svg>
   </button>
   <div class="mob-dropdown" id="nav-mob-dd" hidden>
+    <a href={h('home-valuation')}>{t(menu.homeValuation)}</a>
     <a href={h('guide-island')}>{t(menu.islandGuide)}</a>
     <a href={h('guide-north')}>{t(menu.northGuide)}</a>
     <a href={h('guide-south')}>{t(menu.southGuide)}</a>

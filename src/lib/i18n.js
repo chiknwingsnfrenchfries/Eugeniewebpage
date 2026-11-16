@@ -7,6 +7,7 @@ export const translations = {
     contact: { en: 'Contact Me', fr: 'Me contacter' },
   },
   resourcesMenu: {
+    homeValuation: { en: 'Free Home Valuation', fr: 'Estimation gratuite de votre propriété' },
     islandGuide: { en: "Island of Montreal Buyer's Guide", fr: "Guide de l'acheteur — Île de Montréal" },
     northGuide: { en: "North Shore Montreal Buyer's Guide", fr: "Guide de l'acheteur — Rive-Nord" },
     southGuide: { en: "South Shore Montreal Buyer's Guide", fr: "Guide de l'acheteur — Rive-Sud" },
@@ -224,6 +225,17 @@ export const translations = {
     title1: { en: 'Everything you need', fr: "Tout ce qu'il vous faut" },
     title2: { en: 'to make a great decision.', fr: 'pour prendre la bonne décision.' },
     items: [
+      {
+        tag: { en: 'For Sellers', fr: 'Pour vendeurs' },
+        title: { en: 'Free Home Valuation', fr: 'Estimation gratuite de votre propriété' },
+        body: {
+          en: 'What is your house or condo worth today? Get a free market value estimate within 24 hours, with no obligation.',
+          fr: "Combien vaut votre maison ou votre condo aujourd'hui? Recevez une estimation gratuite de sa valeur marchande en 24 heures, sans engagement.",
+        },
+        cta: { en: 'Request my estimate', fr: 'Demander mon estimation' },
+        href: null,
+        page: 'home-valuation',
+      },
       {
         tag: { en: 'Buyer Guide', fr: "Guide de l'acheteur" },
         title: { en: "Island of Montreal Buyer's Guide", fr: "Guide de l'acheteur — Île de Montréal" },
