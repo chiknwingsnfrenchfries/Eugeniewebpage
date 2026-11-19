@@ -1,0 +1,305 @@
+---
+// The home valuation page content, shared by both versions:
+//   variant="ads"   landing1.eugeniedo.com/  (AdsLayout: no site nav, French, noindex)
+//                   → on success, redirects to /merci/ (the conversion page)
+//   variant="site"  eugeniedo.com/{fr,en}/…/estimation-maison | home-valuation
+//                   (Base layout: site nav + footer, indexed, FAQ structured data,
+//                   extra "why a broker" section) → on success, thank-you shown in place
+// Design: handover-estimation-eugeniedo/mockup/Main.dc.html (2026-11-18).
+import '@fontsource/cormorant-garamond/latin-500-italic.css'
+import '@fontsource/cormorant-garamond/latin-600.css'
+import '@fontsource/dm-sans/latin-400.css'
+import '@fontsource/dm-sans/latin-500.css'
+import '@fontsource/dm-sans/latin-600.css'
+import '../../styles/ads.css'
+import { est, tr, PHONE_TEL, PHONE_SHORT, PRIVACY_URL, SHOW_MARKET_ITEMS } from '../../lib/estimation-copy.js'
+import { trust, GOOGLE_REVIEWS_URL, quoteMarks } from '../../lib/trust-copy.js'
+
+const { lang = 'fr', variant = 'ads' } = Astro.props
+const isAds = variant === 'ads'
+const t = (o) => tr(o, lang)
+const f = est.form
+const [qOpen, qClose] = quoteMarks(lang)
+const receiveItems = est.receive.items.filter((i) => SHOW_MARKET_ITEMS || !i.market)
+const msgs = { required: t(f.required), invalidEmail: t(f.invalidEmail), invalidPhone: t(f.invalidPhone), sending: t(f.sending), submit: t(f.submit) }
+const privacyHref = PRIVACY_URL[lang]
+const formId = isAds ? 'estimation-ads' : 'estimation-ressources'
+const p = isAds ? 'af' : 'sf' // input id prefix
+const STAR = 'M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18.1 5.5 22l1.7-7.4-5.7-5 7.5-.7z'
+const CHECK = 'M20 6L9 17l-5-5'
+const PHONE_ICON = 'M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z'
+
+// FAQ as structured data (site version only; the ads page is noindex)
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: est.faq.items.map((i) => ({ '@type': 'Question', name: t(i.q), acceptedAnswer: { '@type': 'Answer', text: t(i.a) } })),
+}
+---
+<div class:list={['ads', `ads-v-${variant}`]} lang={lang === 'fr' ? 'fr-CA' : 'en-CA'}>
+  {!isAds && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+
+  <div class="ads-top">
+    <section class="ads-hero ads-wrap">
+      <div class="ads-hero-top">
+        <p class="ads-eyebrow">{t(est.eyebrow)}</p>
+        {!isAds && (
+          <a class="ads-pill ads-pill-sm" href={`tel:${PHONE_TEL}`} aria-label={`${t(est.callLabel)}, ${PHONE_SHORT}`} data-track="hero">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={PHONE_ICON} /></svg>
+            {PHONE_SHORT}
+          </a>
+        )}
+      </div>
+      <h1 class="ads-h1">{t(est.h1)}<br /><em>{t(est.h1Em)}</em></h1>
+
+      <div class="ads-broker">
+        <img class="ads-broker-photo" src="/assets/eugenie-headshot-160.webp" alt="Eugenie Do" width="64" height="64" fetchpriority="high" />
+        <div class="ads-broker-text">
+          <span class="ads-broker-name">Eugenie Do</span>
+          <span class="ads-muted">{t(trust.brokerLine)}</span>
+          <span class="ads-rating">
+            <span class="ads-stars" role="img" aria-label={t(trust.starsLabel)}>
+              {[0, 1, 2, 3, 4].map(() => <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={STAR} /></svg>)}
+            </span>
+            {t(trust.ratingShort)}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section id="estimation" class="ads-form-wrap ads-wrap" aria-labelledby={`${p}-title`}>
+      <form class="ads-card ads-form" id="est-form" novalidate data-form-id={formId} data-lang={lang} data-msgs={JSON.stringify(msgs)}>
+        <h2 class="ads-form-title" id={`${p}-title`}>{t(f.title)}</h2>
+
+        <div class="ads-row ads-row-unit">
+          <div class="ads-field" data-field>
+            <label for={`${p}-address`}>{t(f.address)}</label>
+            <input id={`${p}-address`} name="property_address" type="text" required autocomplete="street-address" placeholder={t(f.addressPlaceholder)} />
+            <p class="ads-err" id={`${p}-address-err`} data-err hidden></p>
+          </div>
+          <div class="ads-field" data-field>
+            <label for={`${p}-unit`}>{t(f.unit)} <span class="ads-opt">{t(f.opt)}</span></label>
+            <input id={`${p}-unit`} name="property_unit" type="text" autocomplete="address-line2" placeholder="#" />
+          </div>
+        </div>
+        <div class="ads-row">
+          <div class="ads-field" data-field>
+            <label for={`${p}-first`}>{t(f.firstName)}</label>
+            <input id={`${p}-first`} name="first_name" type="text" required autocomplete="given-name" />
+            <p class="ads-err" id={`${p}-first-err`} data-err hidden></p>
+          </div>
+          <div class="ads-field" data-field>
+            <label for={`${p}-last`}>{t(f.lastName)}</label>
+            <input id={`${p}-last`} name="last_name" type="text" required autocomplete="family-name" />
+            <p class="ads-err" id={`${p}-last-err`} data-err hidden></p>
+          </div>
+        </div>
+        <div class="ads-field" data-field>
+          <label for={`${p}-email`}>{t(f.email)}</label>
+          <input id={`${p}-email`} name="email" type="email" required autocomplete="email" inputmode="email" />
+          <p class="ads-err" id={`${p}-email-err`} data-err hidden></p>
+        </div>
+        <div class="ads-field" data-field>
+          <label for={`${p}-phone`}>{t(f.phone)} <span class="ads-opt">{t(f.phoneOpt)}</span></label>
+          <input id={`${p}-phone`} name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          <p class="ads-err" id={`${p}-phone-err`} data-err hidden></p>
+        </div>
+
+        {/* Honeypot: invisible to people and screen readers; bots fill it → nothing is saved */}
+        <div class="ads-hp" aria-hidden="true">
+          <label for={`${p}-website`}>Website</label>
+          <input id={`${p}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label class="ads-check">
+          <input type="checkbox" name="marketing_consent" />
+          <span>{t(f.consent)}</span>
+        </label>
+
+        <p class="ads-form-error" role="alert" data-form-error hidden>{t(f.error)}</p>
+
+        <button type="submit" class="ads-btn">{t(f.submit)}</button>
+
+        <ul class="ads-checks">
+          {f.checks.map((c) => (
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={CHECK} /></svg>{t(c)}</li>
+          ))}
+        </ul>
+        <p class="ads-notice">{t(f.notice)} <a href={privacyHref}>{t(f.privacy)}</a></p>
+      </form>
+
+      {!isAds && (
+        <div class="ads-card ads-thanks ads-thanks-inline" id="est-thanks" tabindex="-1" hidden>
+          <div class="ads-thanks-icon" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d={CHECK} /></svg>
+          </div>
+          <h2 class="ads-h2">
+            <span data-thanks-heading data-with-name={t(est.thanks.heading)} data-no-name={t(est.thanks.headingNoName)}></span><br />
+            <em>{t(est.thanks.headingEm)}</em>
+          </h2>
+          <p class="ads-body">{t(est.thanks.body)}</p>
+          <p class="ads-hurry">{t(est.thanks.hurry)}</p>
+          <div class="ads-row">
+            <a class="ads-btn" href={`tel:${PHONE_TEL}`} data-track="thanks">{t(est.closing.call)}</a>
+            <a class="ads-btn-outline" href={`sms:${PHONE_TEL}`} data-track="thanks">{t(est.closing.text)}</a>
+          </div>
+          <p class="ads-small">{t(est.thanks.footnote)}</p>
+        </div>
+      )}
+    </section>
+  </div>
+
+  <section class="ads-proof ads-wrap" aria-label="Eugenie Do">
+    {trust.proof.map((x) => (
+      <div class="ads-tile">
+        <span class:list={['ads-tile-big', { 'ads-tile-long': x.long }]}>{t(x.big)}</span>
+        <span class="ads-tile-small">{t(x.small)}</span>
+      </div>
+    ))}
+  </section>
+
+  <section class="ads-section">
+    <div class="ads-wrap">
+      <p class="ads-eyebrow">{t(est.receive.eyebrow)}</p>
+      <h2 class="ads-h2">{t(est.receive.title)}</h2>
+      <ol class="ads-list">
+        {receiveItems.map((i, n) => (
+          <li><span class="ads-list-num" aria-hidden="true">{String(n + 1).padStart(2, '0')}</span>{t(i)}</li>
+        ))}
+      </ol>
+      <p class="ads-small">{t(est.receive.disclaimer)}</p>
+    </div>
+  </section>
+
+  <section class="ads-section ads-tint">
+    <div class="ads-wrap">
+      <h2 class="ads-h2">{t(est.how.title)}</h2>
+      <ol class="ads-steps">
+        {est.how.steps.map((s, n) => (
+          <li>
+            <span class="ads-step-num" aria-hidden="true">{n + 1}</span>
+            <div><strong>{t(s.title)}</strong><span>{t(s.body)}</span></div>
+          </li>
+        ))}
+      </ol>
+      <a class="ads-btn" href="#estimation">{t(f.submit)}</a>
+    </div>
+  </section>
+
+  {!isAds && (
+    <section class="ads-section">
+      <div class="ads-wrap">
+        <h2 class="ads-h2">{t(est.why.title)}</h2>
+        <p class="ads-body">{t(est.why.body)}</p>
+      </div>
+    </section>
+  )}
+
+  <section class:list={['ads-section', { 'ads-tint': !isAds }]}>
+    <div class="ads-wrap">
+      <p class="ads-eyebrow">{t(trust.reviews.eyebrow)}</p>
+      <h2 class="ads-h2">{t(trust.reviews.title)}</h2>
+      <p class="ads-rating-line"><span class="ads-stars-text" aria-hidden="true">★★★★★</span>{t(trust.ratingLong)}</p>
+      {trust.reviews.items.map((r) => (
+        <figure class="ads-review">
+          <span class="ads-stars-text" role="img" aria-label={t(trust.starsLabel)}>★★★★★</span>
+          <blockquote lang={r.lang}>{qOpen}{r.quote}{qClose}</blockquote>
+          <figcaption>{t(r.caption)}</figcaption>
+        </figure>
+      ))}
+      <a class="ads-link" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener">{t(trust.reviews.readAll)}</a>
+    </div>
+  </section>
+
+  <section class:list={['ads-section', { 'ads-tint': isAds }]}>
+    <div class="ads-wrap ads-about">
+      {/* Not lazy-loaded: lazy loading left an empty block on mobile on the old page */}
+      <img class="ads-about-photo" src="/assets/eugenie-portrait-600.webp" alt={t(est.about.agency)} width="600" height="800" decoding="async" />
+      <div>
+        <p class="ads-eyebrow">{t(est.about.eyebrow)}</p>
+        <h2 class="ads-h2">{t(est.about.title)}</h2>
+        <p class="ads-body">{t(est.about.body)}</p>
+        <ul class="ads-ticks">
+          {est.about.points.map((x) => (
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={CHECK} /></svg>{t(x)}</li>
+          ))}
+        </ul>
+        <div class="ads-agency">
+          <img src="/assets/remax-platine.png" alt="RE/MAX Platine" width="110" height="46" loading="lazy" />
+          <p>{t(est.about.agency)}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ads-section">
+    <div class="ads-wrap">
+      <h2 class="ads-h2">{t(est.faq.title)}</h2>
+      <div class="ads-faq">
+        {est.faq.items.map((i) => (
+          <details>
+            <summary>{t(i.q)}</summary>
+            <p>{t(i.a)}{i.privacyLink && <> <a href={privacyHref}>{t(f.privacy)}</a></>}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="ads-wrap">
+    <div class="ads-closing">
+      <h2 class="ads-h2">{t(est.closing.title)}</h2>
+      <p>{t(est.closing.body)}</p>
+      <a class="ads-btn ads-btn-light" href="#estimation">{t(est.closing.cta)}</a>
+      <div class="ads-row">
+        <a class="ads-btn-ghost" href={`tel:${PHONE_TEL}`} data-track="closing">{t(est.closing.call)}</a>
+        <a class="ads-btn-ghost" href={`sms:${PHONE_TEL}`} data-track="closing">{t(est.closing.text)}</a>
+      </div>
+    </div>
+  </section>
+
+  {isAds && (
+    <div class="ads-sticky" id="ads-sticky" hidden>
+      <a class="ads-btn" href="#estimation">{t(est.sticky.cta)}</a>
+      <a class="ads-sticky-call" href={`tel:${PHONE_TEL}`} aria-label={t(est.callLabel)} data-track="sticky">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={PHONE_ICON} /></svg>
+      </a>
+    </div>
+  )}
+</div>
+
+<script>
+  import { initEstimationForm, trackContactLinks } from '../../lib/estimation-form.js'
+
+  const form = document.getElementById('est-form') as HTMLFormElement
+  const thanks = document.getElementById('est-thanks')
+
+  if (form.dataset.formId === 'estimation-ads') {
+    // Ads version: the thank-you page is the conversion
+    initEstimationForm(form, { redirectTo: '/merci/' })
+  } else {
+    // Site version: thank-you shown in place of the form
+    initEstimationForm(form, {
+      onSuccess: (info: { first_name?: string }) => {
+        const h = thanks!.querySelector('[data-thanks-heading]') as HTMLElement
+        h.textContent = info.first_name
+          ? (h.dataset.withName || '').replace('{prenom}', info.first_name)
+          : h.dataset.noName || ''
+        form.hidden = true
+        thanks!.hidden = false
+        thanks!.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        thanks!.focus({ preventScroll: true })
+      },
+    })
+  }
+  trackContactLinks(document)
+
+  // Mobile sticky bar (ads version): shown once the visitor has scrolled past the
+  // form, hidden whenever the form is on screen. Hidden on desktop via CSS.
+  const sticky = document.getElementById('ads-sticky')
+  if (sticky) {
+    new IntersectionObserver(([entry]) => {
+      sticky.hidden = !(!entry.isIntersecting && entry.boundingClientRect.top < 0)
+    }).observe(form)
+  }
+</script>

@@ -4,6 +4,19 @@ Static site built with [Astro](https://astro.build). Every page is a real HTML f
 URL, in French and English, so search engines and AI assistants can read it without running
 JavaScript. Deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` on every push to `main`.
 
+## Two sites from one repo
+
+| Site | Build | Output | Hosting |
+|---|---|---|---|
+| eugeniedo.com | `npm run build` | `dist/` | GitHub Pages (workflow on push to `main`) |
+| landing1.eugeniedo.com (ads landing page, noindex) | `npm run build:landing` | `dist-landing/` | Cloudflare Pages (connected to this repo) |
+
+The ads landing page's routes are in `src-landing/pages/` (config: `astro.landing.config.mjs`,
+static files: `public-landing/`). Its content is the same component as the indexed
+valuation page on eugeniedo.com: `src/components/estimation/EstimationContent.astro`
+(`variant="ads"` vs `variant="site"`). Copy: `src/lib/estimation-copy.js`; trust signals and
+reviews: `src/lib/trust-copy.js`; form logic and tracking: `src/lib/estimation-form.js`.
+
 ## Run / build
 
 ```
@@ -22,6 +35,8 @@ src/lib/i18n.js          all page copy, FR + EN
 src/lib/schema.js        structured data (RealEstateAgent) shown to search engines
 src/lib/flags.js         SHOW_REVIEWS
 src/lib/supabase.js      supabaseInsert() used by the forms
+supabase/migrations/     SQL for the leads/newsletter tables (run in the Supabase SQL editor)
+supabase/functions/      send-lead-email Edge Function (deploy by pasting into Supabase)
 src/layouts/Base.astro   <head>, nav, footer, CSS (imported in the original cascade order)
 src/components/          Nav, Footer, Newsletter, InstagramFeed, Tracking, FadeUp
 src/views/               one file per page type (Placeholder.astro: empty privacy + terms pages)

@@ -15,6 +15,7 @@ import { supabaseInsert } from './supabase.js'
 
 export const LEAD_SOURCE = 'eugeniedo.com-estimation'
 const PENDING_KEY = 'ed_lead_pending'
+const NAME_KEY = 'ed_lead_name' // first name, kept for the visit so a reload of /merci/ still greets them
 
 const EMAIL_RE = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/
 
@@ -63,6 +64,10 @@ export function trackLead(info) {
 
 // Thank-you page: returns the just-submitted lead (or null) and fires the
 // conversion once. Reloading the page or opening it directly does not count again.
+export function rememberedFirstName() {
+  try { return sessionStorage.getItem(NAME_KEY) || '' } catch (e) { return '' }
+}
+
 export function consumePendingLead() {
   let info = null
   try { info = JSON.parse(sessionStorage.getItem(PENDING_KEY) || 'null') } catch (e) { info = null }
@@ -153,7 +158,10 @@ export function initEstimationForm(form, { onSuccess, redirectTo } = {}) {
     const firstName = el.first_name.value.trim()
     const done = (info) => {
       if (redirectTo) {
-        try { sessionStorage.setItem(PENDING_KEY, JSON.stringify(info)) } catch (err) {}
+        try {
+          sessionStorage.setItem(PENDING_KEY, JSON.stringify(info))
+          sessionStorage.setItem(NAME_KEY, info.first_name || '')
+        } catch (err) {}
         window.location.assign(redirectTo)
       } else if (onSuccess) {
         onSuccess(info)

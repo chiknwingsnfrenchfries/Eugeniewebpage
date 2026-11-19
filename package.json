@@ -7,7 +7,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "build:landing": "astro build --config astro.landing.config.mjs",
+    "preview:landing": "astro preview --config astro.landing.config.mjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.3.0",
@@ -16,5 +18,8 @@
   },
   "devDependencies": {
     "oxlint": "^1.90.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

@@ -1,27 +1,25 @@
 ---
-// Layout for paid-traffic landing pages (Google Ads, Meta): no site navigation,
-// minimal header and footer, noindex, no canonical or language alternates.
-// Same consent banner, RudderStack and GTM as the rest of the site (Tracking.astro).
-// Self-contained CSS (ads.css) so the page stays light.
+// Layout for the paid-traffic landing page on landing1.eugeniedo.com (Google Ads, Meta).
+// No site navigation, minimal header and footer, always noindex, no canonical.
+// Same consent banner, RudderStack and GTM as eugeniedo.com (Tracking.astro).
+// Does not load the main site's CSS; styles come with EstimationContent (ads.css).
+import headingFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2?url'
+import bodyFont from '@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2?url'
 import '@fontsource/cormorant-garamond/latin-500-italic.css'
 import '@fontsource/cormorant-garamond/latin-600.css'
 import '@fontsource/dm-sans/latin-400.css'
 import '@fontsource/dm-sans/latin-500.css'
 import '@fontsource/dm-sans/latin-600.css'
 import '../styles/ads.css'
-import headingFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2?url'
-import bodyFont from '@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2?url'
 import favicon from '../assets-favicon.svg?url'
 import Tracking from '../components/Tracking.astro'
 import Attribution from '../components/Attribution.astro'
-import { ROUTES, href } from '../lib/routes.js'
-import { ads, PHONE_SHORT, PHONE_TEL } from '../lib/estimation-ads-copy.js'
+import { est, tr, PHONE_SHORT, PHONE_TEL, PRIVACY_URL } from '../lib/estimation-copy.js'
 
-const { page } = Astro.props
+const { thanks = false } = Astro.props
 const lang = 'fr'
-const isThanks = page === 'estimation-ads-thanks'
-const title = isThanks ? ads.thanks.title : ads.title
-const route = ROUTES[page]
+const t = (o) => tr(o, lang)
+const title = thanks ? t(est.thanks.title) : t(est.meta.adsTitle)
 ---
 <!DOCTYPE html>
 <html lang="fr-CA">
@@ -31,12 +29,11 @@ const route = ROUTES[page]
     <Tracking lang={lang} />
     <Attribution />
     <title>{title}</title>
-    <meta name="description" content={ads.description} />
-    {route.noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="description" content={t(est.meta.adsDescription)} />
+    <meta name="robots" content="noindex, follow" />
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href={favicon} />
-    <slot name="head" />
   </head>
   <body class="ads">
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T74GLFPF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -45,9 +42,9 @@ const route = ROUTES[page]
       <div class="ads-wrap ads-header-inner">
         <div class="ads-brand">
           <span class="ads-logo">Eugenie Do</span>
-          {!isThanks && <span class="ads-brand-line">{ads.headerLine}</span>}
+          {!thanks && <span class="ads-brand-line">{t(est.headerLine)}</span>}
         </div>
-        {!isThanks && (
+        {!thanks && (
           <a class="ads-pill" href={`tel:${PHONE_TEL}`} data-track="header">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"></path></svg>
             {PHONE_SHORT}
@@ -62,12 +59,12 @@ const route = ROUTES[page]
 
     <footer class="ads-footer">
       <div class="ads-wrap">
-        <p>{ads.footer.agency}</p>
+        <p>{t(est.footer.agency)}</p>
         <p class="ads-footer-links">
-          <a href={href('privacy', 'fr')}>{ads.footer.privacy}</a>
-          <button type="button" data-gt-cookie-widget-show="true">{ads.footer.cookies}</button>
+          <a href={PRIVACY_URL[lang]}>{t(est.footer.privacy)}</a>
+          <button type="button" data-gt-cookie-widget-show="true">{t(est.footer.cookies)}</button>
         </p>
-        <p>{ads.footer.copy}</p>
+        <p>{t(est.footer.copy)}</p>
       </div>
     </footer>
   </body>

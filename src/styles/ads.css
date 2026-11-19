@@ -11,7 +11,8 @@
   --a-label: #4A3B35;
   --a-muted: #6B5A52;
   --a-accent-text: #8A5A48;
-  --a-primary: #9C5B48;      /* white text on it: ~5.3:1 contrast */
+  --a-primary: #9C5B48;      /* button fill; white text on it: ~5.3:1 contrast */
+  --a-link: #8A4F3D;         /* text/outline version: ≥5:1 on the cream and tinted backgrounds */
   --a-primary-dk: #7A4535;
   --a-star: #B9822F;
   --a-line: #E2D4CB;
@@ -25,8 +26,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-body.ads {
-  margin: 0;
+body.ads { margin: 0; }
+.ads {
   background: var(--a-bg);
   color: var(--a-text);
   font-family: var(--a-sans);
@@ -37,7 +38,7 @@ body.ads {
 .ads h1, .ads h2, .ads p, .ads figure, .ads blockquote, .ads ol, .ads ul { margin: 0; }
 .ads ol, .ads ul { padding: 0; list-style: none; }
 .ads img { display: block; max-width: 100%; }
-.ads a { color: var(--a-primary); }
+.ads a { color: var(--a-link); }
 .ads a:hover { color: var(--a-primary-dk); }
 .ads :focus-visible { outline: 3px solid var(--a-primary); outline-offset: 2px; }
 [hidden] { display: none !important; }
@@ -46,14 +47,16 @@ body.ads {
 
 /* Header */
 .ads-header { border-bottom: 1px solid var(--a-line); background: var(--a-bg); }
+.ads-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ads .ads-pill-sm { min-height: 44px; padding: 0 12px; font-size: 13px; }
 .ads-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; padding-bottom: 14px; }
 .ads-brand { display: flex; flex-direction: column; gap: 2px; }
 .ads-logo { font-family: var(--a-serif); font-size: 24px; font-style: italic; font-weight: 500; line-height: 1; }
 .ads-brand-line { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--a-muted); }
 .ads .ads-pill {
   display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px;
-  border: 1px solid var(--a-primary); border-radius: 999px; text-decoration: none;
-  font-size: 14px; font-weight: 600; color: var(--a-primary); white-space: nowrap;
+  border: 1px solid var(--a-link); border-radius: 999px; text-decoration: none;
+  font-size: 14px; font-weight: 600; color: var(--a-link); white-space: nowrap;
 }
 
 /* Type */
@@ -119,7 +122,7 @@ body.ads {
 }
 .ads .ads-btn-ghost { border: 1px solid #8C7B73; color: var(--a-bg); }
 .ads .ads-btn-ghost:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.ads .ads-btn-outline { min-height: 52px; border: 1px solid var(--a-primary); color: var(--a-primary); font-size: 15px; }
+.ads .ads-btn-outline { min-height: 52px; border: 1px solid var(--a-link); color: var(--a-link); font-size: 15px; }
 
 /* Proof tiles */
 .ads-proof { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 20px; padding-bottom: 8px; }
@@ -166,6 +169,11 @@ body.ads {
 .ads-faq details[open] summary::after { content: "−"; }
 .ads-faq details p { padding: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--a-label); }
 
+.ads-agency { display: flex; align-items: center; gap: 14px; padding-top: 4px; }
+.ads-agency img { width: 110px; height: auto; flex: none; }
+.ads-agency p { font-size: 13px; line-height: 1.45; color: var(--a-muted); }
+.ads-thanks-inline { padding: 24px 18px; margin: 0 -8px; gap: 16px; }
+
 /* Closing */
 .ads-closing {
   margin: 8px -8px 40px; padding: 32px 20px; border-radius: 18px; background: var(--a-dark); color: var(--a-bg);
@@ -178,7 +186,7 @@ body.ads {
 .ads-footer .ads-wrap { display: flex; flex-direction: column; gap: 10px; }
 .ads-footer-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .ads-footer-links a, .ads-footer-links button {
-  font: inherit; font-size: 12px; color: var(--a-primary); background: none; border: 0; padding: 0;
+  font: inherit; font-size: 12px; color: var(--a-link); background: none; border: 0; padding: 0;
   text-decoration: underline; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center;
 }
 
@@ -190,8 +198,8 @@ body.ads {
 }
 .ads-sticky .ads-btn { flex: 1; min-height: 52px; }
 .ads .ads-sticky-call {
-  flex: none; width: 52px; min-height: 52px; border-radius: 12px; border: 1px solid var(--a-primary);
-  display: flex; align-items: center; justify-content: center; color: var(--a-primary);
+  flex: none; width: 52px; min-height: 52px; border-radius: 12px; border: 1px solid var(--a-link);
+  display: flex; align-items: center; justify-content: center; color: var(--a-link);
 }
 
 /* Thank-you page */
@@ -204,7 +212,7 @@ body.ads {
 @media (min-width: 768px) {
   .ads-sticky { display: none !important; }
   .ads-footer { padding-bottom: 72px; }
-  .ads-form, .ads-closing { margin-left: 0; margin-right: 0; }
+  .ads-form, .ads-closing, .ads-thanks-inline { margin-left: 0; margin-right: 0; }
   .ads-h1 { font-size: 52px; }
 }
 @media (min-width: 1024px) {
@@ -216,3 +224,9 @@ body.ads {
   .ads-hero { padding-top: 24px; }
   .ads-form-wrap { padding: 0; }
 }
+@media (min-width: 1024px) {
+  .ads-header .ads-wrap, .ads-footer .ads-wrap { max-width: 1100px; padding: 0 32px; }
+}
+
+/* Links inside running text are underlined, not told apart by colour alone */
+.ads-notice a, .ads-faq p a, .ads-body a { text-decoration: underline; }

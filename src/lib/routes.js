@@ -3,9 +3,9 @@
 //
 // noindex: true keeps a page out of search engines and the sitemap. Use it for
 // placeholder pages until they have real content.
-// layout: 'ads' → paid-traffic landing page: no site nav/footer, no canonical
-// or language alternates, never linked from the rest of the site. A route may
-// exist in only some languages (just leave the others out).
+// A route may exist in only some languages (just leave the others out).
+// The ads landing page is NOT here: it is a separate build for
+// landing1.eugeniedo.com (see src-landing/ and astro.landing.config.mjs).
 import { SHOW_REVIEWS } from './flags.js'
 
 export const LANGS = ['fr', 'en']
@@ -41,9 +41,6 @@ export const ROUTES = {
     noindex: true,
   },
   contact:   { en: '/en/contact/', fr: '/fr/contact/' },
-  // Google Ads / Meta landing page for free home valuations (French only)
-  'estimation-ads':        { fr: '/fr/estimation-gratuite/', noindex: true, layout: 'ads' },
-  'estimation-ads-thanks': { fr: '/fr/estimation-gratuite/merci/', noindex: true, layout: 'ads' },
   privacy:   { en: '/en/privacy/', fr: '/fr/confidentialite/', noindex: true },
   terms:     { en: '/en/terms/', fr: '/fr/conditions-utilisation/', noindex: true },
 }

@@ -403,7 +403,7 @@ export const translations = {
     terms: { en: 'Terms & Conditions', fr: "Conditions d'utilisation" },
     privacy: { en: 'Privacy Policy', fr: 'Politique de confidentialité' },
     cookies: { en: 'Cookie preferences', fr: 'Préférences de témoins' },
-    copy: { en: '© Eugenie Do · All rights reserved 2024', fr: '© Eugenie Do · Tous droits réservés 2024' },
+    copy: { en: '© 2026 Eugenie Do · All rights reserved', fr: '© 2026 Eugenie Do · Tous droits réservés' },
     region: { en: 'RE/MAX · Greater Montreal Area', fr: 'RE/MAX · Grand Montréal' },
   },
 }

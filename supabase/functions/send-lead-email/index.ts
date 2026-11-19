@@ -162,8 +162,19 @@ function siteSignature(isFr: boolean): string {
 // Attribution block shown to Eugenie (UTMs, Google Ads click ID, page)
 function attribution(lead: Record<string, any>): string {
   const clickId = lead.gclid ? 'gclid ✓' : lead.gbraid ? 'gbraid ✓' : lead.wbraid ? 'wbraid ✓' : null;
-  return `<div class="meta"><b>Provenance :</b> ${utmSummary(lead)}${clickId ? ` · <b>Google Ads :</b> ${clickId}` : ''}
+  const FORMS: Record<string, string> = {
+    'estimation-ads': "Page d'annonces (landing1)",
+    'estimation-ressources': 'Site · Ressources clients',
+  };
+  return `<div class="meta"><b>Provenance :</b> ${utmSummary(lead)}${clickId ? ` · <b>Google Ads :</b> ${clickId}` : ''}${lead.fbclid ? ' · <b>Meta :</b> fbclid ✓' : ''}
+        ${lead.form_id ? `<br/><b>Formulaire :</b> ${FORMS[lead.form_id] || lead.form_id}` : ''}
+        ${lead.landing_page ? `<br/><b>Page d'arrivée :</b> ${lead.landing_page}` : ''}
         ${lead.source_url ? `<br/><span style="color:rgba(255,255,255,0.45)">${lead.source_url}</span>` : ''}</div>`;
+}
+
+// Address with the optional unit ("App." field)
+function fullAddress(lead: Record<string, any>): string {
+  return lead.property_unit ? `${lead.property_address}, app. ${lead.property_unit}` : (lead.property_address || '');
 }
 
 // ── VALUATION (eugeniedo.com/…/estimation-maison) ──────────────────────────
@@ -174,11 +185,11 @@ function valuationNotification(lead: Record<string, any>): string {
     lang: 'fr',
     title: `Demande d'estimation — ${name}`,
     eyebrow: "🏠 Nouvelle demande d'estimation",
-    heading: lead.property_address || '—',
+    heading: fullAddress(lead) || '—',
     sub: `${name} · Langue : ${lead.lang === 'en' ? 'EN' : 'FR'}`,
     body: `
       <p class="label">Propriété</p>
-      ${field('Adresse', lead.property_address)}
+      ${field('Adresse', fullAddress(lead))}
       <p class="label" style="margin-top:20px">Coordonnées</p>
       ${field('Nom', name)}
       ${field('Courriel', lead.email)}
@@ -194,7 +205,7 @@ function valuationNotification(lead: Record<string, any>): string {
 function valuationConfirmation(lead: Record<string, any>): string {
   const isFr = lead.lang !== 'en';
   const first = lead.first_name || '';
-  const addr = lead.property_address || '';
+  const addr = fullAddress(lead);
   if (isFr) {
     return siteLayout({
       lang: 'fr',
@@ -619,7 +630,7 @@ function buildEmails(raw: Record<string, any>, lead: Record<string, any>) {
     return {
       notification: {
         from: `${FROM_NAME} · Site <${FROM_ADDRESS}>`,
-        subject: `🏠 Demande d'estimation — ${plain(raw.property_address, 60) || fullName}`,
+        subject: `🏠 Demande d'estimation — ${plain(raw.property_unit ? `${raw.property_address}, app. ${raw.property_unit}` : raw.property_address, 70) || fullName}`,
         html: valuationNotification(lead),
       },
       confirmation: {

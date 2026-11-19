@@ -1,0 +1,4 @@
+# Ads landing page. Pages carry a noindex tag; crawling stays allowed so
+# Google Ads can check the page and search engines can see the noindex.
+User-agent: *
+Allow: /
