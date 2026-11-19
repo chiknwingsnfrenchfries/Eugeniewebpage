@@ -1,0 +1,57 @@
+---
+// Thank-you page after the ads landing page form: /fr/estimation-gratuite/merci/ (noindex).
+// Design: handover-estimation-eugeniedo/mockup/Parcours.dc.html.
+//
+// This page load is the Google Ads / Meta conversion. The `generate_lead` event
+// is pushed here ONCE per real submission (see consumePendingLead): reloading the
+// page or opening it directly does not count again.
+//
+// The first name comes from sessionStorage, not from the URL, so it never reaches
+// analytics or ad platforms as part of the page address. A `?prenom=` parameter
+// is still honoured if present. It is always inserted as text, never as HTML.
+import { ads, PHONE_TEL } from '../lib/estimation-ads-copy.js'
+
+const t = ads.thanks
+---
+<section class="ads-thanks ads-wrap">
+  <div class="ads-thanks-icon" aria-hidden="true">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+  </div>
+  <h1 class="ads-h1 ads-thanks-h1">
+    <span id="thanks-heading" data-with-name={t.heading} data-no-name={t.headingNoName}>{t.headingNoName}</span><br />
+    <em>{t.headingEm}</em>
+  </h1>
+  <p class="ads-body">{t.body}</p>
+
+  <div class="ads-broker">
+    <img class="ads-broker-photo" src="/assets/eugenie-headshot-160.webp" alt="Eugenie Do" width="56" height="56" />
+    <div class="ads-broker-text">
+      <span class="ads-broker-name">Eugenie Do</span>
+      <span class="ads-muted">{t.brokerLine}</span>
+    </div>
+  </div>
+
+  <p class="ads-hurry">{t.hurry}</p>
+  <div class="ads-row">
+    <a class="ads-btn" href={`tel:${PHONE_TEL}`} data-track="thanks">{t.call}</a>
+    <a class="ads-btn-outline" href={`sms:${PHONE_TEL}`} data-track="thanks">{t.text}</a>
+  </div>
+  <p class="ads-small">{t.footnote}</p>
+</section>
+
+<script>
+  import { consumePendingLead, trackContactLinks } from '../lib/estimation-form.js'
+
+  const info = consumePendingLead() // fires generate_lead once if a lead was just submitted
+  let name = info && info.first_name ? info.first_name : ''
+  if (!name) name = (new URLSearchParams(location.search).get('prenom') || '').trim()
+  name = name.slice(0, 40)
+
+  const heading = document.getElementById('thanks-heading') as HTMLElement
+  // textContent: the name is shown as plain text, never parsed as HTML
+  heading.textContent = name
+    ? (heading.dataset.withName || '').replace('{prenom}', name)
+    : heading.dataset.noName || ''
+
+  trackContactLinks(document)
+</script>

@@ -18,6 +18,7 @@ export const valuation = {
     { fr: 'Préparé par une personne, pas par un algorithme', en: 'Prepared by a person, not an algorithm' },
     { fr: 'Maison, condo ou plex, partout dans le Grand Montréal', en: 'House, condo or plex, anywhere in Greater Montreal' },
   ],
+  callLabel: { fr: 'Appeler Eugenie', en: 'Call Eugenie' },
   agency: {
     fr: 'Eugenie Do, courtière immobilière résidentielle, RE/MAX Platine',
     en: 'Eugenie Do, residential real estate broker, RE/MAX Platine',
@@ -26,6 +27,8 @@ export const valuation = {
     title: { fr: 'Demandez votre estimation gratuite', en: 'Request your free estimate' },
     address: { fr: 'Adresse de la propriété', en: 'Property address' },
     addressPlaceholder: { fr: 'Ex. : 123, rue Principale, Brossard', en: 'e.g. 123 Main St, Brossard' },
+    unit: { fr: 'App.', en: 'Apt.' },
+    unitOpt: { fr: '(opt.)', en: '(opt.)' },
     firstName: { fr: 'Prénom', en: 'First name' },
     lastName: { fr: 'Nom', en: 'Last name' },
     email: { fr: 'Courriel', en: 'Email' },

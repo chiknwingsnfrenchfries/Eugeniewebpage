@@ -2,8 +2,8 @@
 // eugeniedo.com/ → /fr/ or /en/.
 // Old hash links (eugeniedo.com/#/fr/about) are sent to their new URL.
 // Without JavaScript, the meta refresh goes to the French home page.
-import { ROUTES } from '../lib/routes.js'
-const map = Object.fromEntries(Object.entries(ROUTES).map(([k, r]) => [k, { en: r.en, fr: r.fr }]))
+import { legacyHashTargets } from '../lib/routes.js'
+const map = legacyHashTargets()
 ---
 <!DOCTYPE html>
 <html lang="fr-CA">

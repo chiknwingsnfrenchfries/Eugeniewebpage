@@ -13,8 +13,10 @@ import Valuation from '../views/Valuation.astro'
 import { ROUTES, LANGS } from '../lib/routes.js'
 
 export function getStaticPaths() {
-  return Object.entries(ROUTES).flatMap(([page, r]) =>
-    LANGS.map((lang) => ({ params: { path: r[lang].replace(/^\/|\/$/g, '') }, props: { page, lang } })))
+  // Ads landing pages have their own route files (src/pages/fr/estimation-gratuite/)
+  // so they don't load the main site's CSS.
+  return Object.entries(ROUTES).filter(([, r]) => r.layout !== 'ads').flatMap(([page, r]) =>
+    LANGS.filter((lang) => r[lang]).map((lang) => ({ params: { path: r[lang].replace(/^\/|\/$/g, '') }, props: { page, lang } })))
 }
 
 const { page, lang } = Astro.props
