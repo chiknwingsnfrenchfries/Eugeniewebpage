@@ -17,6 +17,22 @@ valuation page on eugeniedo.com: `src/components/estimation/EstimationContent.as
 (`variant="ads"` vs `variant="site"`). Copy: `src/lib/estimation-copy.js`; trust signals and
 reviews: `src/lib/trust-copy.js`; form logic and tracking: `src/lib/estimation-form.js`.
 
+### Cloudflare setup for landing1 (Workers Builds)
+
+Worker **eugeniedo-landing1**, connected to this repo (Workers & Pages → Create → Continue with GitHub):
+
+| Setting | Value |
+|---|---|
+| Build command | `npm run build:landing` |
+| Deploy command | `npx wrangler deploy --config wrangler.landing.jsonc` |
+| Preview command | `npx wrangler versions upload --config wrangler.landing.jsonc` |
+| Build variable | `NODE_VERSION` = `22` |
+| Production branch | `claude/quirky-darwin-igv2if` until the landing page is merged; then `main` (Settings → Build → Branch control) |
+
+Builds start on each push to the production branch ("Retry build" re-runs the same commit).
+The custom domain `landing1.eugeniedo.com` is added under the Worker's **Domains** tab when the
+page should go live; until then it is only reachable on its `*.workers.dev` address.
+
 ## Run / build
 
 ```
