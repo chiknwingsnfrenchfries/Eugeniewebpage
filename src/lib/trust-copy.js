@@ -29,6 +29,8 @@ export const trust = {
     items: [
       {
         lang: 'en', // quoted as written on Google
+        // Shorter excerpt shown beside the form on desktop (English pages)
+        short: 'Eugenie helped us sell our home [...] we truly felt she had our best interests at heart.',
         quote: "Eugenie helped us sell our home in the West Island and buy our new house in the Laurentians [...] we truly felt she had our best interests at heart. She is super organised and she does her research well before she proposes anything to us.",
         caption: {
           fr: "Maz · Vente dans l'Ouest-de-l'Île et achat dans les Laurentides · Avis Google",
@@ -37,11 +39,18 @@ export const trust = {
       },
       {
         lang: 'fr', // quoted as written on Google
+        // Shorter excerpt shown beside the form on desktop (French pages)
+        short: "Une personne humaine, disponible en tout temps, à l'écoute, qui ne nous a jamais mis de pression, mais qui est aussi extrêmement compétente!",
         quote: "Une personne humaine, disponible en tout temps, à l'écoute, qui ne nous a jamais mis de pression, mais qui est aussi extrêmement compétente! [...] Quelqu'un qui connaît très bien tout ce qu'il y a à savoir au niveau technique des propriétés et des rénovations.",
         caption: { fr: 'Olivier G. · Premier achat · Avis Google', en: 'Olivier G. · First purchase · Google review' },
       },
     ],
   },
+}
+
+// Review shown beside the form on desktop: one in the page's language
+export function featuredReview(lang) {
+  return trust.reviews.items.find((r) => r.lang === lang) || trust.reviews.items[0]
 }
 
 // Opening/closing quote marks per page language

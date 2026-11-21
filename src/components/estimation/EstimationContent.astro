@@ -13,13 +13,14 @@ import '@fontsource/dm-sans/latin-500.css'
 import '@fontsource/dm-sans/latin-600.css'
 import '../../styles/ads.css'
 import { est, tr, PHONE_TEL, PHONE_SHORT, PRIVACY_URL, SHOW_MARKET_ITEMS } from '../../lib/estimation-copy.js'
-import { trust, GOOGLE_REVIEWS_URL, quoteMarks } from '../../lib/trust-copy.js'
+import { trust, GOOGLE_REVIEWS_URL, quoteMarks, featuredReview } from '../../lib/trust-copy.js'
 
 const { lang = 'fr', variant = 'ads' } = Astro.props
 const isAds = variant === 'ads'
 const t = (o) => tr(o, lang)
 const f = est.form
 const [qOpen, qClose] = quoteMarks(lang)
+const featured = featuredReview(lang)
 const receiveItems = est.receive.items.filter((i) => SHOW_MARKET_ITEMS || !i.market)
 const msgs = { required: t(f.required), invalidEmail: t(f.invalidEmail), invalidPhone: t(f.invalidPhone), sending: t(f.sending), submit: t(f.submit) }
 const privacyHref = PRIVACY_URL[lang]
@@ -94,6 +95,7 @@ const faqSchema = {
             <p class="ads-err" id={`${p}-last-err`} data-err hidden></p>
           </div>
         </div>
+        <div class="ads-row-desk">
         <div class="ads-field" data-field>
           <label for={`${p}-email`}>{t(f.email)}</label>
           <input id={`${p}-email`} name="email" type="email" required autocomplete="email" inputmode="email" />
@@ -103,6 +105,7 @@ const faqSchema = {
           <label for={`${p}-phone`}>{t(f.phone)} <span class="ads-opt">{t(f.phoneOpt)}</span></label>
           <input id={`${p}-phone`} name="phone" type="tel" autocomplete="tel" inputmode="tel" />
           <p class="ads-err" id={`${p}-phone-err`} data-err hidden></p>
+        </div>
         </div>
 
         {/* Honeypot: invisible to people and screen readers; bots fill it → nothing is saved */}
@@ -147,18 +150,24 @@ const faqSchema = {
         </div>
       )}
     </section>
+
+    <section class="ads-proof ads-wrap" aria-label="Eugenie Do">
+      {trust.proof.map((x) => (
+        <div class="ads-tile">
+          <span class:list={['ads-tile-big', { 'ads-tile-long': x.long }]}>{t(x.big)}</span>
+          <span class="ads-tile-small">{t(x.small)}</span>
+        </div>
+      ))}
+    </section>
+
+    {/* Desktop only: a short review beside the form (the full reviews are further down) */}
+    <figure class="ads-feature" aria-hidden="true">
+      <blockquote lang={featured.lang}>{qOpen}{featured.short}{qClose}</blockquote>
+      <figcaption>{t(featured.caption)}</figcaption>
+    </figure>
   </div>
 
-  <section class="ads-proof ads-wrap" aria-label="Eugenie Do">
-    {trust.proof.map((x) => (
-      <div class="ads-tile">
-        <span class:list={['ads-tile-big', { 'ads-tile-long': x.long }]}>{t(x.big)}</span>
-        <span class="ads-tile-small">{t(x.small)}</span>
-      </div>
-    ))}
-  </section>
-
-  <section class="ads-section">
+  <section class="ads-section ads-s-receive">
     <div class="ads-wrap">
       <p class="ads-eyebrow">{t(est.receive.eyebrow)}</p>
       <h2 class="ads-h2">{t(est.receive.title)}</h2>
@@ -171,7 +180,7 @@ const faqSchema = {
     </div>
   </section>
 
-  <section class="ads-section ads-tint">
+  <section class="ads-section ads-tint ads-s-how">
     <div class="ads-wrap">
       <h2 class="ads-h2">{t(est.how.title)}</h2>
       <ol class="ads-steps">
@@ -187,7 +196,7 @@ const faqSchema = {
   </section>
 
   {!isAds && (
-    <section class="ads-section">
+    <section class="ads-section ads-s-narrow">
       <div class="ads-wrap">
         <h2 class="ads-h2">{t(est.why.title)}</h2>
         <p class="ads-body">{t(est.why.body)}</p>
@@ -195,23 +204,25 @@ const faqSchema = {
     </section>
   )}
 
-  <section class:list={['ads-section', { 'ads-tint': !isAds }]}>
+  <section class:list={['ads-section', 'ads-s-reviews', { 'ads-tint': !isAds }]}>
     <div class="ads-wrap">
       <p class="ads-eyebrow">{t(trust.reviews.eyebrow)}</p>
       <h2 class="ads-h2">{t(trust.reviews.title)}</h2>
       <p class="ads-rating-line"><span class="ads-stars-text" aria-hidden="true">★★★★★</span>{t(trust.ratingLong)}</p>
-      {trust.reviews.items.map((r) => (
-        <figure class="ads-review">
-          <span class="ads-stars-text" role="img" aria-label={t(trust.starsLabel)}>★★★★★</span>
-          <blockquote lang={r.lang}>{qOpen}{r.quote}{qClose}</blockquote>
-          <figcaption>{t(r.caption)}</figcaption>
-        </figure>
-      ))}
+      <div class="ads-reviews">
+        {trust.reviews.items.map((r) => (
+          <figure class="ads-review">
+            <span class="ads-stars-text" role="img" aria-label={t(trust.starsLabel)}>★★★★★</span>
+            <blockquote lang={r.lang}>{qOpen}{r.quote}{qClose}</blockquote>
+            <figcaption>{t(r.caption)}</figcaption>
+          </figure>
+        ))}
+      </div>
       <a class="ads-link" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener">{t(trust.reviews.readAll)}</a>
     </div>
   </section>
 
-  <section class:list={['ads-section', { 'ads-tint': isAds }]}>
+  <section class:list={['ads-section', 'ads-s-about', { 'ads-tint': isAds }]}>
     <div class="ads-wrap ads-about">
       {/* Not lazy-loaded: lazy loading left an empty block on mobile on the old page */}
       <img class="ads-about-photo" src="/assets/eugenie-portrait-600.webp" alt={t(est.about.agency)} width="600" height="800" decoding="async" />
@@ -232,7 +243,7 @@ const faqSchema = {
     </div>
   </section>
 
-  <section class="ads-section">
+  <section class="ads-section ads-s-narrow">
     <div class="ads-wrap">
       <h2 class="ads-h2">{t(est.faq.title)}</h2>
       <div class="ads-faq">
@@ -246,12 +257,14 @@ const faqSchema = {
     </div>
   </section>
 
-  <section class="ads-wrap">
+  <section class="ads-wrap ads-s-closing">
     <div class="ads-closing">
-      <h2 class="ads-h2">{t(est.closing.title)}</h2>
-      <p>{t(est.closing.body)}</p>
+      <div class="ads-closing-text">
+        <h2 class="ads-h2">{t(est.closing.title)}</h2>
+        <p>{t(est.closing.body)}</p>
+      </div>
       <a class="ads-btn ads-btn-light" href="#estimation">{t(est.closing.cta)}</a>
-      <div class="ads-row">
+      <div class="ads-row ads-closing-row">
         <a class="ads-btn-ghost" href={`tel:${PHONE_TEL}`} data-track="closing">{t(est.closing.call)}</a>
         <a class="ads-btn-ghost" href={`sms:${PHONE_TEL}`} data-track="closing">{t(est.closing.text)}</a>
       </div>

@@ -180,6 +180,8 @@ body.ads { margin: 0; }
   display: flex; flex-direction: column; gap: 16px;
 }
 .ads-closing p { font-size: 15px; line-height: 1.55; color: #E3D3C9; }
+.ads-closing-text { display: flex; flex-direction: column; gap: 16px; }
+.ads-reviews { display: flex; flex-direction: column; gap: 16px; }
 
 /* Footer (bottom padding keeps links clear of the cookie icon and the sticky bar) */
 .ads-footer { padding: 24px 0 120px; border-top: 1px solid var(--a-line); font-size: 12px; color: var(--a-muted); }
@@ -208,25 +210,100 @@ body.ads { margin: 0; }
 .ads-thanks-h1 { font-size: 36px; line-height: 1.05; }
 .ads-hurry { font-size: 14px; font-weight: 600; }
 
-/* Desktop: centred column; above 1024px the form sits beside the hero */
+/* Phones/tablets: the desktop-only review beside the form is hidden;
+   email + phone stay stacked (the wrapper just passes its gap through). */
+.ads-feature { display: none; }
+.ads-row-desk { display: flex; flex-direction: column; gap: 14px; }
+.ads-h1 { text-wrap: balance; }
+
+/* Tablet and up: no sticky bar, more breathing room in the header */
 @media (min-width: 768px) {
   .ads-sticky { display: none !important; }
   .ads-footer { padding-bottom: 72px; }
   .ads-form, .ads-closing, .ads-thanks-inline { margin-left: 0; margin-right: 0; }
   .ads-h1 { font-size: 52px; }
+  .ads-header-inner { padding-top: 22px; padding-bottom: 22px; }
 }
+
+/* Desktop (1024px+): the form sits beside the hero, and the sections below
+   use the full width instead of a phone-width column. */
 @media (min-width: 1024px) {
+  /* Side padding only: the shorthand would also zero the header's top/bottom padding */
+  .ads-header .ads-wrap, .ads-footer .ads-wrap { max-width: 1100px; padding-left: 32px; padding-right: 32px; }
+
+  /* Top: left column = hero, proof tiles, featured review; right = form */
   .ads-top {
-    display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 48px;
-    max-width: 1100px; margin: 0 auto; padding: 48px 32px 24px; align-items: start;
+    display: grid; grid-template-columns: minmax(0, 1fr) 460px; column-gap: 56px; row-gap: 16px;
+    grid-template-rows: auto auto 1fr;
+    max-width: 1100px; margin: 0 auto; padding: 48px 32px 56px; align-items: start;
   }
   .ads-top .ads-wrap { max-width: none; padding: 0; }
-  .ads-hero { padding-top: 24px; }
-  .ads-form-wrap { padding: 0; }
-}
-@media (min-width: 1024px) {
-  .ads-header .ads-wrap, .ads-footer .ads-wrap { max-width: 1100px; padding: 0 32px; }
+  .ads-hero { grid-column: 1; grid-row: 1; padding: 8px 0 0; gap: 14px; }
+  .ads-proof { grid-column: 1; grid-row: 2; padding: 0; }
+  .ads-feature { grid-column: 1; grid-row: 3; }
+  .ads-h1 { font-size: 48px; }
+  .ads-tile { padding: 10px 8px; }
+  .ads-tile-big { font-size: 22px; }
+  .ads-tile-big.ads-tile-long { font-size: 17px; }
+  .ads-form-wrap { grid-column: 2; grid-row: 1 / span 3; padding: 0; }
+
+  .ads-feature {
+    display: flex; flex-direction: column; gap: 8px; margin: 0;
+    background: var(--a-card); border-radius: 14px; padding: 16px 20px;
+    border-left: 3px solid var(--a-primary);
+  }
+  .ads-feature blockquote { font-family: var(--a-serif); font-size: 18px; font-style: italic; font-weight: 500; line-height: 1.35; }
+  .ads-feature figcaption { font-size: 12px; color: var(--a-muted); }
+
+  /* Shorter form: email + phone side by side, checks on one line, tighter gaps */
+  .ads-form { gap: 12px; padding: 26px 26px 22px; }
+  .ads-row-desk { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ads-field input { min-height: 48px; }
+  .ads-checks { flex-wrap: nowrap; gap: 14px; font-size: 12.5px; white-space: nowrap; }
+
+  /* Sections below: full width */
+  .ads-section { padding: 72px 0 64px; }
+  .ads-section .ads-wrap { max-width: 1100px; padding: 0 32px; }
+  .ads-h2 { font-size: 38px; }
+
+  /* What you receive: heading left, list right */
+  .ads-s-receive .ads-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); column-gap: 64px; row-gap: 14px; align-items: start; }
+  .ads-s-receive .ads-eyebrow, .ads-s-receive .ads-h2, .ads-s-receive .ads-small { grid-column: 1; }
+  .ads-s-receive .ads-list { grid-column: 2; grid-row: 1 / span 4; }
+
+  /* How it works: three steps in a row */
+  .ads-s-how .ads-steps { flex-direction: row; gap: 32px; }
+  .ads-s-how .ads-steps li { flex: 1; flex-direction: column; gap: 14px; }
+  .ads-s-how .ads-btn { max-width: 360px; }
+
+  /* Reviews: side by side */
+  .ads-reviews { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+  .ads-review { padding: 24px; }
+
+  /* About: photo beside the text */
+  .ads-section .ads-about { display: grid; grid-template-columns: 380px minmax(0, 1fr); column-gap: 56px; align-items: center; }
+  .ads-about-photo { height: 460px; }
+
+  /* Text-only sections stay at a comfortable reading width */
+  .ads-s-narrow .ads-wrap { max-width: 860px; }
+
+  /* Closing block: text left, buttons right */
+  .ads-s-closing { max-width: 1100px; padding: 0 32px; }
+  .ads-closing {
+    display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    column-gap: 48px; row-gap: 12px; align-items: center; padding: 44px 48px; margin-bottom: 64px;
+  }
+  .ads-closing-text { grid-column: 1; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 14px; }
+  .ads-closing .ads-btn-light { grid-column: 2; grid-row: 1; }
+  .ads-closing-row { grid-column: 2; grid-row: 2; }
 }
 
 /* Links inside running text are underlined, not told apart by colour alone */
 .ads-notice a, .ads-faq p a, .ads-body a { text-decoration: underline; }
+
+/* Narrow desktops (1024–1199px): slimmer form column so the left side isn't squeezed */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .ads-top { grid-template-columns: minmax(0, 1fr) 420px; column-gap: 40px; }
+  .ads-form { padding: 22px 20px 20px; }
+  .ads-checks { flex-wrap: wrap; white-space: normal; }
+}

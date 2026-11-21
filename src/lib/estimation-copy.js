@@ -26,7 +26,8 @@ export const est = {
   headerLine: { fr: 'Courtière · RE/MAX Platine', en: 'Broker · RE/MAX Platine' },
   eyebrow: { fr: 'Grand Montréal · Estimation gratuite', en: 'Greater Montreal · Free home valuation' },
   h1: { fr: "Combien vaut votre maison aujourd'hui?", en: 'What is your home worth today?' },
-  h1Em: { fr: '100 % gratuit. Réponse en 24 h.', en: '100% free. Answer within 24 h.' },
+  // \u00A0 = non-breaking space: keeps "100 %" and "24 h" on one line
+  h1Em: { fr: '100\u00A0% gratuit. Réponse en 24\u00A0h.', en: '100% free. Answer within 24\u00A0h.' },
   callLabel: { fr: 'Appeler Eugenie', en: 'Call Eugenie' },
 
   form: {
