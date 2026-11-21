@@ -9,7 +9,7 @@ JavaScript. Deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` on 
 | Site | Build | Output | Hosting |
 |---|---|---|---|
 | eugeniedo.com | `npm run build` | `dist/` | GitHub Pages (workflow on push to `main`) |
-| landing1.eugeniedo.com (ads landing page, noindex) | `npm run build:landing` | `dist-landing/` | Cloudflare Pages (connected to this repo) |
+| landing1.eugeniedo.com (ads landing page, noindex) | `npm run build:landing` | `dist-landing/` | Cloudflare Workers (static assets), config `wrangler.landing.jsonc`, connected to this repo |
 
 The ads landing page's routes are in `src-landing/pages/` (config: `astro.landing.config.mjs`,
 static files: `public-landing/`). Its content is the same component as the indexed

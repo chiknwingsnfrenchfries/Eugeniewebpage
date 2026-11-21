@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config'
 
-// Second build: the ads landing page for landing1.eugeniedo.com (Cloudflare Pages).
+// Second build: the ads landing page for landing1.eugeniedo.com (Cloudflare Workers, see wrangler.landing.jsonc).
 //   npm run build:landing  →  dist-landing/
 // Pages live in src-landing/pages and reuse components from src/.
 export default defineConfig({
