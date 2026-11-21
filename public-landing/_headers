@@ -1,4 +1,4 @@
-# Response headers for landing1.eugeniedo.com (Cloudflare Workers static assets)
+# Response headers for landing1.eugeniedo.com (Cloudflare Pages)
 /*
   X-Robots-Tag: noindex
   X-Content-Type-Options: nosniff

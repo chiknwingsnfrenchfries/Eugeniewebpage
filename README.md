@@ -9,7 +9,7 @@ JavaScript. Deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` on 
 | Site | Build | Output | Hosting |
 |---|---|---|---|
 | eugeniedo.com | `npm run build` | `dist/` | GitHub Pages (workflow on push to `main`) |
-| landing1.eugeniedo.com (ads landing page, noindex) | `npm run build:landing` | `dist-landing/` | Cloudflare Workers (static assets), config `wrangler.landing.jsonc`, connected to this repo |
+| landing1.eugeniedo.com (ads landing page, noindex) | `npm run build:landing` | `dist-landing/` | Cloudflare Pages project `landing1-eugeniedo`, connected to this repo |
 
 The ads landing page's routes are in `src-landing/pages/` (config: `astro.landing.config.mjs`,
 static files: `public-landing/`). Its content is the same component as the indexed
@@ -17,21 +17,23 @@ valuation page on eugeniedo.com: `src/components/estimation/EstimationContent.as
 (`variant="ads"` vs `variant="site"`). Copy: `src/lib/estimation-copy.js`; trust signals and
 reviews: `src/lib/trust-copy.js`; form logic and tracking: `src/lib/estimation-form.js`.
 
-### Cloudflare setup for landing1 (Workers Builds)
+### Cloudflare setup for landing1 (Pages)
 
-Worker **eugeniedo-landing1**, connected to this repo (Workers & Pages → Create → Continue with GitHub):
+Pages project **landing1-eugeniedo** (Workers & Pages → Create → "Continue to Pages" →
+Import an existing Git repository). eugeniedo.com's DNS stays at Squarespace, which is why
+this is Pages rather than a Worker: Workers custom domains need the DNS on Cloudflare.
 
 | Setting | Value |
 |---|---|
 | Build command | `npm run build:landing` |
-| Deploy command | `npx wrangler deploy --config wrangler.landing.jsonc` |
-| Preview command | `npx wrangler versions upload --config wrangler.landing.jsonc` |
-| Build variable | `NODE_VERSION` = `22` |
-| Production branch | `claude/quirky-darwin-igv2if` until the landing page is merged; then `main` (Settings → Build → Branch control) |
+| Build output directory | `dist-landing` |
+| Environment variable | `NODE_VERSION` = `22` |
+| Production branch | `claude/quirky-darwin-igv2if` until the landing page is merged; then `main` (Settings → Builds & deployments) |
+| Custom domain | `landing1.eugeniedo.com` |
+| DNS (Squarespace) | CNAME `landing1` → `landing1-eugeniedo.pages.dev` |
 
-Builds start on each push to the production branch ("Retry build" re-runs the same commit).
-The custom domain `landing1.eugeniedo.com` is added under the Worker's **Domains** tab when the
-page should go live; until then it is only reachable on its `*.workers.dev` address.
+Each push to the production branch redeploys. Response headers (noindex, caching) come from
+`public-landing/_headers`.
 
 ## Run / build
 
