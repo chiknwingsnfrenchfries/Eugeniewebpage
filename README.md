@@ -28,7 +28,7 @@ this is Pages rather than a Worker: Workers custom domains need the DNS on Cloud
 | Build command | `npm run build:landing` |
 | Build output directory | `dist-landing` |
 | Environment variable | `NODE_VERSION` = `22` |
-| Production branch | `claude/quirky-darwin-igv2if` until the landing page is merged; then `main` (Settings → Builds & deployments) |
+| Production branch | `main` (other branches get preview deployments on `*.landing1-eugeniedo.pages.dev`) |
 | Custom domain | `landing1.eugeniedo.com` |
 | DNS (Squarespace) | CNAME `landing1` → `landing1-eugeniedo.pages.dev` |
 
