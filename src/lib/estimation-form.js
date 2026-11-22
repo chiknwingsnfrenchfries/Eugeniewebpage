@@ -73,7 +73,12 @@ export function consumePendingLead() {
   try { info = JSON.parse(sessionStorage.getItem(PENDING_KEY) || 'null') } catch (e) { info = null }
   if (!info) return null
   try { sessionStorage.removeItem(PENDING_KEY) } catch (e) {}
-  if (!info.tracked) trackLead(info)
+  if (!info.tracked) {
+    // Wait until the consent banner has reported the visitor's choice (max 2 s,
+    // see Tracking.astro) so the conversion is sent with the right consent state.
+    if (typeof window.onConsentReady === 'function') window.onConsentReady(() => trackLead(info))
+    else trackLead(info)
+  }
   return info
 }
 

@@ -3,9 +3,13 @@
 // 1. GetTerms CMP — must be the first <script> on the page. It sets Google
 //    Consent Mode defaults per region, shows the banner, and blocks known
 //    third-party scripts until their category is accepted (auto=true).
-// 2. RudderStack
-// 3. Google Tag Manager — GA4 / Google Ads tags inside it follow Consent Mode
-//    ("advanced" mode: cookieless pings until analytics/ads consent).
+// 2. Google Consent Mode, set by this file (GetTerms does not send Consent Mode
+//    signals to Google: Tag Assistant showed "Default consent state has not been
+//    set"). Defaults: everything denied; then updated from GetTerms' choice, or
+//    its region default (Canada is opt-out → granted until the visitor declines).
+// 3. RudderStack
+// 4. Google Tag Manager — Google Ads / GA4 tags inside it follow Consent Mode
+//    ("advanced" mode: cookieless pings while denied).
 //
 // RudderStack policy (decided 2026-11-15):
 // - Every page view is sent to RudderStack for every visitor, whatever they
@@ -35,6 +39,50 @@ const GTM_ID = 'GTM-T74GLFPF'
 <!-- End GetTerms CMP -->
 
 <script is:inline>
+  // ── Google Consent Mode ─────────────────────────────────────────────────────
+  window.dataLayer = window.dataLayer || []
+  function gtag() { window.dataLayer.push(arguments) }
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    functionality_storage: 'denied',
+    personalization_storage: 'denied',
+    security_storage: 'granted',
+    wait_for_update: 2000, // tags wait up to 2 s for GetTerms before firing
+  })
+  gtag('set', 'ads_data_redaction', true) // strip ad identifiers while ad_storage is denied
+
+  function googleConsentFrom(c) {
+    var g = function (v) { return v ? 'granted' : 'denied' }
+    return {
+      ad_storage: g(c.marketing),
+      ad_user_data: g(c.marketing),
+      ad_personalization: g(c.marketing),
+      analytics_storage: g(c.analytics),
+      functionality_storage: g(c.functional),
+      personalization_storage: g(c.functional),
+    }
+  }
+
+  // Callbacks waiting for the first consent state (e.g. the thank-you page waits
+  // before sending its conversion). Released on the first GetTerms report, or
+  // after 2 s if GetTerms never answers (blocked, offline…).
+  window.consentKnown = false
+  var consentWaiters = []
+  window.onConsentReady = function (cb) {
+    if (window.consentKnown) { cb(); return }
+    consentWaiters.push(cb)
+  }
+  function releaseConsentWaiters() {
+    if (window.consentKnown) return
+    window.consentKnown = true
+    var w = consentWaiters.splice(0)
+    for (var i = 0; i < w.length; i++) { try { w[i]() } catch (e) { console.error(e) } }
+  }
+  setTimeout(releaseConsentWaiters, 2000)
+
   // window.rs('track', ...) is safe to call at any time: calls made before the
   // SDK has loaded are queued and replayed in initRudderStack().
   window.rsQueue = window.rsQueue || []
@@ -81,10 +129,17 @@ const GTM_ID = 'GTM-T74GLFPF'
     rsConsentApplied = true
   }
 
-  window.addEventListener('getterms:consent', function (e) {
-    readGetTerms(e.detail)
+  function onGetTermsConsent(detail) {
+    if (!detail || !detail.preferences) return
+    readGetTerms(detail)
+    gtag('consent', 'update', googleConsentFrom(window.siteConsent))
     applyRsConsent()
-  })
+    releaseConsentWaiters()
+  }
+  window.addEventListener('getterms:consent', function (e) { onGetTermsConsent(e.detail) })
+  // GetTerms' blocker script loads before this one; if it already knows the
+  // visitor's choice, apply it now.
+  if (window.GetTermsCMP && window.GetTermsCMP.consent) onGetTermsConsent(window.GetTermsCMP.consent)
 
   function initRudderStack() {
     if (window.GetTermsCMP && window.GetTermsCMP.consent) readGetTerms(window.GetTermsCMP.consent)
