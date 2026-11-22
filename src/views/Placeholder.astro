@@ -1,15 +1,29 @@
 ---
-// Empty legal pages until the real texts are written (kept out of search via noindex in routes.js).
+// Legal pages.
+// - privacy: forwards to the GetTerms-hosted policy (src/lib/legal.js), so older
+//   links to /fr/confidentialite/ and /en/privacy/ keep working.
+// - terms: empty until the terms of use are written.
+// Both stay noindex (routes.js).
+import { PRIVACY_POLICY_URL } from '../lib/legal.js'
+
 const { lang, page } = Astro.props
 const TITLES = {
   privacy: { fr: 'Politique de confidentialité', en: 'Privacy Policy' },
   terms: { fr: "Conditions d'utilisation", en: 'Terms & Conditions' },
 }
 const fr = lang === 'fr'
+const target = page === 'privacy' ? PRIVACY_POLICY_URL[lang] : null
 ---
 <section class="guide-section">
   <div class="container">
     <h1 class="section-title guide-title">{TITLES[page][lang]}</h1>
-    <p class="guide-sub">{fr ? 'Cette page sera bientôt disponible.' : 'This page is coming soon.'}</p>
+    {target ? (
+      <p class="guide-sub">
+        <a href={target}>{fr ? 'Lire la politique de confidentialité →' : 'Read the privacy policy →'}</a>
+      </p>
+    ) : (
+      <p class="guide-sub">{fr ? 'Cette page sera bientôt disponible.' : 'This page is coming soon.'}</p>
+    )}
   </div>
 </section>
+{target && <script is:inline define:vars={{ target }}>location.replace(target)</script>}

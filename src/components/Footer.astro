@@ -2,6 +2,7 @@
 import { translations, useLang } from '../lib/i18n.js'
 import { SHOW_REVIEWS } from '../lib/flags.js'
 import { href } from '../lib/routes.js'
+import { PRIVACY_POLICY_URL } from '../lib/legal.js'
 
 const { lang } = Astro.props
 const t = useLang(lang)
@@ -29,7 +30,7 @@ const h = (k) => href(k, lang)
         <h4>{t(tx.footer.help)}</h4>
         <ul>
           <li><a href={h('terms')}>{t(tx.footer.terms)}</a></li>
-          <li><a href={h('privacy')}>{t(tx.footer.privacy)}</a></li>
+          <li><a href={PRIVACY_POLICY_URL[lang]}>{t(tx.footer.privacy)}</a></li>
           <li><button type="button" data-gt-cookie-widget-show="true">{t(tx.footer.cookies)}</button></li>
           <li><a href="mailto:contact@eugeniedo.com">contact@eugeniedo.com</a></li>
           <li><a href="tel:+14384102420">(438) 410-2420</a></li>

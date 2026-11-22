@@ -10,7 +10,7 @@ export const PHONE_DISPLAY = '(438) 410-2420'
 export const PHONE_SHORT = '438 410-2420'
 export const PHONE_TEL = '+14384102420'
 export const SITE_ORIGIN = 'https://eugeniedo.com'
-export const PRIVACY_URL = { fr: `${SITE_ORIGIN}/fr/confidentialite/`, en: `${SITE_ORIGIN}/en/privacy/` }
+export { PRIVACY_POLICY_URL as PRIVACY_URL } from './legal.js' // GetTerms-hosted policy, per language
 
 // ⚠️ Items 02–04 of "Ce que vous recevez" may only go live once Eugenie has
 // confirmed every estimate includes them. Set to false to cut them.
